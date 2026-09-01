@@ -345,6 +345,7 @@
     transition: background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease, transform .08s ease;
   }
   .btn:active{ transform: translateY(1px) scale(.97); }
+  .btn:focus-visible{ outline: 2px solid var(--brass-bright); outline-offset: 2px; }
   .btn-primary{
     background: linear-gradient(180deg, var(--brass-bright), var(--brass) 55%, var(--brass-dim));
     color: var(--walnut-seam);
@@ -526,6 +527,8 @@
     border: 1px solid rgba(176,141,87,.3);
     box-shadow: var(--shadow-deep);
   }
+  .modal-card.confirm-card{ max-width: 380px; margin: 18% auto; }
+  .modal-card.confirm-card .desc{ opacity:.85; }
   .modal-card h3{ margin:0 0 4px; font-weight:700; font-size:19px; letter-spacing:-0.3px; }
   .modal-card p.desc{ font-size: 13.5px; opacity:.7; margin-top:4px; line-height:1.55; }
   .field{ margin-top: 16px; }
@@ -701,6 +704,18 @@
   </div>
 </div>
 
+<!-- Confirm modal -->
+<div class="w3-modal" id="confirmModal">
+  <div class="modal-card confirm-card">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p class="desc" id="confirmBody"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="confirmCancel" style="flex:1;">Cancel</button>
+      <button class="btn btn-primary" id="confirmOk" style="flex:1;">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -838,6 +853,11 @@
     historyList: document.getElementById('historyList'),
     netBadge: document.getElementById('netBadge'),
     settingsModal: document.getElementById('settingsModal'),
+    confirmModal: document.getElementById('confirmModal'),
+    confirmTitle: document.getElementById('confirmTitle'),
+    confirmBody: document.getElementById('confirmBody'),
+    confirmOk: document.getElementById('confirmOk'),
+    confirmCancel: document.getElementById('confirmCancel'),
     openSettings: document.getElementById('openSettings'),
     closeSettings: document.getElementById('closeSettings'),
     saveSettings: document.getElementById('saveSettings'),
@@ -978,7 +998,12 @@
   async function endSession(){
     if (state.status === 'idle' || state.status === 'ended') return;
     const total = currentMs('focused') + currentMs('break');
-    if (!confirm(`End this session and save it? Total time logged: ${msToClock(total)}.`)) return;
+    const ok = await askConfirm({
+      title: 'End session?',
+      body: `This saves the session with ${msToClock(total)} logged and clears the clock.`,
+      confirmText: 'End & save'
+    });
+    if (!ok) return;
 
     finalizeSegment();
     state.status = 'ended';
@@ -1124,6 +1149,25 @@
   function openModal(){ el.settingsModal.style.display = 'block'; }
   function closeModal(){ el.settingsModal.style.display = 'none'; }
 
+  // Promise-based confirm rendered as an in-page modal, drop-in for window.confirm.
+  let confirmResolver = null;
+  function askConfirm({ title, body, confirmText = 'Confirm', danger = false }){
+    if (confirmResolver) closeConfirm(false);
+    el.confirmTitle.textContent = title;
+    el.confirmBody.textContent = body;
+    el.confirmOk.textContent = confirmText;
+    el.confirmOk.className = 'btn ' + (danger ? 'btn-danger' : 'btn-primary');
+    el.confirmOk.style.flex = '1';
+    el.confirmModal.style.display = 'block';
+    el.confirmOk.focus();
+    return new Promise(resolve => { confirmResolver = resolve; });
+  }
+  function closeConfirm(result){
+    el.confirmModal.style.display = 'none';
+    if (confirmResolver){ const r = confirmResolver; confirmResolver = null; r(result); }
+  }
+  function confirmOpen(){ return el.confirmModal.style.display === 'block'; }
+
   /* ================= Export / Import ================= */
   function downloadBlob(blob, filename){
     const url = URL.createObjectURL(blob);
@@ -1219,6 +1263,10 @@
   el.saveSettings.addEventListener('click', saveSettings);
   el.settingsModal.addEventListener('click', (e) => { if (e.target === el.settingsModal) closeModal(); });
 
+  el.confirmOk.addEventListener('click', () => closeConfirm(true));
+  el.confirmCancel.addEventListener('click', () => closeConfirm(false));
+  el.confirmModal.addEventListener('click', (e) => { if (e.target === el.confirmModal) closeConfirm(false); });
+
   el.exportBtn.addEventListener('click', exportData);
   el.exportCsvBtn.addEventListener('click', exportCsv);
   el.importBtn.addEventListener('click', () => el.importFile.click());
@@ -1238,7 +1286,10 @@
   });
 
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Escape'){
+      if (confirmOpen()) closeConfirm(false);
+      else closeModal();
+    }
   });
 
   document.getElementById('sessionTitle').addEventListener('input', (e) => {
