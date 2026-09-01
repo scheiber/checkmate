@@ -116,7 +116,7 @@
 
   /* ---------- Session strip ---------- */
   .session-strip{
-    margin: 0 2px 16px;
+    margin: 0 2px 14px;
   }
   .session-title{
     background:transparent;
@@ -127,29 +127,9 @@
     font-size: 15px;
     width: 100%;
     padding: 4px 2px;
-    margin-bottom: 12px;
     border-bottom: 1px dashed rgba(237,230,214,.25);
   }
   .session-title:focus{ outline:none; border-bottom-color: var(--brass-bright); }
-  .session-total{
-    display:flex;
-    align-items:baseline;
-    gap: 10px;
-    white-space:nowrap;
-  }
-  .session-total-label{
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--brass-dim);
-  }
-  .session-total-time{
-    font-size: clamp(30px, 8vw, 40px);
-    line-height: 1;
-    color: var(--brass-bright);
-    letter-spacing: 1px;
-    text-shadow: 0 1px 2px rgba(0,0,0,.4);
-  }
 
   /* ---------- Clock case ---------- */
   .clock-case{
@@ -291,6 +271,27 @@
   @keyframes pulse{
     0%,100%{ opacity:1; }
     50%{ opacity:.45; }
+  }
+
+  /* Total plaque: same case furniture as the two paddles, but it just reads
+     out the running total, so it never idles, never dims, and isn't tappable. */
+  .total-panel{
+    cursor: default;
+    user-select: text;
+    min-height: 0;
+    padding: 14px 16px 12px;
+    margin-bottom: 8px;
+    text-align: center;
+    opacity: 1;
+  }
+  .total-panel:active{
+    transform: none;
+    box-shadow: inset 0 2px 4px rgba(255,255,255,.35), inset 0 -6px 14px rgba(0,0,0,.12), 0 3px 0 rgba(0,0,0,.2);
+  }
+  .total-panel .mode-label{ margin-bottom: 4px; }
+  .total-panel .screen .digits{
+    color: var(--brass-bright);
+    text-shadow: 0 0 8px rgba(217,183,124,.55), 0 0 2px rgba(217,183,124,.9);
   }
 
   .hinge{
@@ -600,13 +601,13 @@
 
   <div class="session-strip">
     <input type="text" class="session-title" id="sessionTitle" placeholder="Untitled session" maxlength="60">
-    <div class="session-total">
-      <span class="session-total-label mono">Total</span>
-      <span class="session-total-time mono" id="sessionTotal">00:00:00</span>
-    </div>
   </div>
 
   <div class="clock-case">
+    <div class="panel total-panel">
+      <span class="mode-label">Total</span>
+      <div class="screen"><span class="digits mono" id="sessionTotal">00:00:00</span></div>
+    </div>
     <div class="panels">
       <div class="panel focused-panel is-idle" id="focusedPanel" role="button" tabindex="0">
         <span class="pip"></span>
