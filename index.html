@@ -116,11 +116,7 @@
 
   /* ---------- Session strip ---------- */
   .session-strip{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap: 10px;
-    margin: 0 2px 14px;
+    margin: 0 2px 16px;
   }
   .session-title{
     background:transparent;
@@ -131,13 +127,28 @@
     font-size: 15px;
     width: 100%;
     padding: 4px 2px;
+    margin-bottom: 12px;
     border-bottom: 1px dashed rgba(237,230,214,.25);
   }
   .session-title:focus{ outline:none; border-bottom-color: var(--brass-bright); }
   .session-total{
-    font-size: 13px;
+    display:flex;
+    align-items:baseline;
+    gap: 10px;
     white-space:nowrap;
+  }
+  .session-total-label{
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--brass-dim);
+  }
+  .session-total-time{
+    font-size: clamp(30px, 8vw, 40px);
+    line-height: 1;
     color: var(--brass-bright);
+    letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0,0,0,.4);
   }
 
   /* ---------- Clock case ---------- */
@@ -589,7 +600,10 @@
 
   <div class="session-strip">
     <input type="text" class="session-title" id="sessionTitle" placeholder="Untitled session" maxlength="60">
-    <span class="session-total mono" id="sessionTotal">00:00:00</span>
+    <div class="session-total">
+      <span class="session-total-label mono">Total</span>
+      <span class="session-total-time mono" id="sessionTotal">00:00:00</span>
+    </div>
   </div>
 
   <div class="clock-case">
@@ -611,8 +625,7 @@
   </div>
 
   <div class="transport">
-    <button class="btn btn-primary" id="primaryBtn">Start studying</button>
-    <button class="btn btn-ghost" id="endBtn" disabled>End</button>
+    <button class="btn btn-primary" id="primaryBtn">Start</button>
   </div>
 
   <div class="ticker-wrap">
@@ -811,7 +824,6 @@
     breakDigits: document.getElementById('breakDigits'),
     statusLine: document.getElementById('statusLine'),
     primaryBtn: document.getElementById('primaryBtn'),
-    endBtn: document.getElementById('endBtn'),
     ticker: document.getElementById('ticker'),
     historyList: document.getElementById('historyList'),
     netBadge: document.getElementById('netBadge'),
@@ -869,9 +881,17 @@
       el.statusLine.textContent = 'session ended';
     }
 
-    el.primaryBtn.textContent = state.status === 'idle' ? 'Start studying' : (state.status==='ended' ? 'Start new session' : 'Switch');
-    el.primaryBtn.style.visibility = state.status === 'running' ? 'hidden' : 'visible';
-    el.endBtn.disabled = state.status === 'idle' || state.status === 'ended';
+    // One button covers the whole lifecycle: start it, end it, start the next.
+    if (state.status === 'running'){
+      el.primaryBtn.textContent = 'End session';
+      el.primaryBtn.className = 'btn btn-ghost';
+    } else if (state.status === 'ended'){
+      el.primaryBtn.textContent = 'New session';
+      el.primaryBtn.className = 'btn btn-primary';
+    } else {
+      el.primaryBtn.textContent = 'Start';
+      el.primaryBtn.className = 'btn btn-primary';
+    }
   }
 
   // Live clock loop. Only reschedules itself while a segment is actually
@@ -1180,9 +1200,9 @@
 
   el.primaryBtn.addEventListener('click', () => {
     if (state.status === 'idle') switchTo('focused');
-    else if (state.status === 'ended') resetToIdle();
+    else if (state.status === 'running') endSession();
+    else resetToIdle();
   });
-  el.endBtn.addEventListener('click', endSession);
 
   el.openSettings.addEventListener('click', openModal);
   el.closeSettings.addEventListener('click', closeModal);
