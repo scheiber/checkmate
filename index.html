@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2B211B">
+<meta name="description" content="A study timer that works like a chess clock, switching between focused and break time.">
+<title>Checkmate Study Time Tracker</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='16' fill='%232B211B'/%3E%3Ccircle cx='35' cy='50' r='22' fill='none' stroke='%23B08D57' stroke-width='4'/%3E%3Ccircle cx='65' cy='50' r='22' fill='none' stroke='%23B08D57' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --walnut:#2B211B;
+    --walnut-light:#3D3025;
+    --walnut-seam:#1C1510;
+    --parchment:#EDE6D6;
+    --parchment-dim:#DCD2B9;
+    --brass:#B08D57;
+    --brass-bright:#D9B77C;
+    --brass-dim:#8A6D42;
+    --focus:#3F6B4F;
+    --focus-bright:#5C9271;
+    --unfocus:#A6472B;
+    --unfocus-bright:#C96A4C;
+    --ink:#211A14;
+    --cream:#F5EFE2;
+    --danger:#8C3B2C;
+    --radius-case:22px;
+    --radius-panel:14px;
+    --shadow-deep: 0 18px 40px rgba(0,0,0,.45), 0 2px 0 rgba(255,255,255,.03) inset;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(circle at 50% -10%, #4a392b 0%, var(--walnut) 45%, var(--walnut-seam) 100%);
+    color:var(--parchment);
+    font-family:'Spectral', Georgia, serif;
+    min-height:100vh;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+    padding-bottom: 48px;
+    position: relative;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity:.05;
+    mix-blend-mode:overlay;
+    pointer-events:none;
+  }
+  .mono{
+    font-family:'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  a{color:var(--brass-bright);}
+
+  /* ---------- Shell ---------- */
+  .shell{
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 18px 16px 0;
+  }
+
+  header.top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    padding: 6px 4px 18px;
+  }
+  header.top h1{
+    font-size: clamp(26px, 6vw, 34px);
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.2px;
+    color: var(--cream);
+    line-height: 1.1;
+  }
+  header.top h1 .tagline{
+    display:block;
+    font-family:'Spectral', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+    color: var(--brass-bright);
+    margin-top: 3px;
+  }
+  header.top .sub{
+    display:block;
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: var(--brass-bright);
+    opacity:.65;
+  }
+  .icon-btn{
+    background: linear-gradient(180deg, var(--walnut-light), var(--walnut-seam));
+    border: 1px solid rgba(176,141,87,.35);
+    color: var(--brass-bright);
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06), inset 0 -2px 4px rgba(0,0,0,.3), 0 2px 4px rgba(0,0,0,.3);
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+  }
+  .icon-btn:active{ transform: scale(.94); }
+  .icon-btn svg{ width:20px; height:20px; }
+
+  /* ---------- Session strip ---------- */
+  .session-strip{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 10px;
+    margin: 0 2px 14px;
+  }
+  .session-title{
+    background:transparent;
+    border:none;
+    color: var(--parchment);
+    font-family:'Spectral', serif;
+    font-style:italic;
+    font-size: 15px;
+    width: 100%;
+    padding: 4px 2px;
+    border-bottom: 1px dashed rgba(237,230,214,.25);
+  }
+  .session-title:focus{ outline:none; border-bottom-color: var(--brass-bright); }
+  .session-total{
+    font-size: 13px;
+    white-space:nowrap;
+    color: var(--brass-bright);
+  }
+
+  /* ---------- Clock case ---------- */
+  .clock-case{
+    position: relative;
+    background-repeat: no-repeat;
+    background-image:
+      radial-gradient(circle at 3px 3px, #e7d4a6 0%, #8a6d42 55%, transparent 60%),
+      radial-gradient(circle at 3px 3px, #e7d4a6 0%, #8a6d42 55%, transparent 60%),
+      radial-gradient(circle at 3px 3px, #e7d4a6 0%, #8a6d42 55%, transparent 60%),
+      radial-gradient(circle at 3px 3px, #e7d4a6 0%, #8a6d42 55%, transparent 60%),
+      repeating-linear-gradient(97deg, rgba(0,0,0,.16) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,.025) 3px, rgba(0,0,0,0) 7px, rgba(0,0,0,.08) 9px, rgba(0,0,0,0) 13px),
+      linear-gradient(180deg, #3A2C20, #241B14);
+    background-size: 8px 8px, 8px 8px, 8px 8px, 8px 8px, auto, auto;
+    background-position: 12px 12px, calc(100% - 12px) 12px, 12px calc(100% - 12px), calc(100% - 12px) calc(100% - 12px), 0 0, 0 0;
+    border-radius: var(--radius-case);
+    padding: 10px;
+    box-shadow: var(--shadow-deep), inset 0 1px 0 rgba(255,255,255,.05);
+    border: 1px solid rgba(176,141,87,.3);
+  }
+  .clock-case::after{
+    content:"";
+    position:absolute;
+    inset: 6px;
+    border-radius: calc(var(--radius-case) - 8px);
+    border: 1px solid rgba(0,0,0,.35);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,.04);
+    pointer-events:none;
+  }
+  .panels{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  @media (min-width: 560px){
+    .panels{ flex-direction:row; }
+  }
+
+  .panel{
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    border-radius: var(--radius-panel);
+    padding: 20px 16px 16px;
+    background: var(--parchment-dim);
+    color: var(--ink);
+    cursor:pointer;
+    user-select:none;
+    border: 2px solid rgba(0,0,0,.15);
+    box-shadow: inset 0 2px 4px rgba(255,255,255,.35), inset 0 -6px 14px rgba(0,0,0,.12), 0 3px 0 rgba(0,0,0,.2);
+    transition: transform .08s ease, background .25s ease, box-shadow .25s ease;
+    min-height: 158px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .panel::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: repeating-linear-gradient(135deg, rgba(0,0,0,.04) 0px, rgba(0,0,0,.04) 1px, transparent 1px, transparent 4px);
+    pointer-events:none;
+  }
+  .panel::after{
+    content:"";
+    position:absolute; inset:0;
+    background: linear-gradient(160deg, rgba(255,255,255,.22), rgba(255,255,255,0) 38%);
+    pointer-events:none;
+  }
+  .panel:active{ transform: scale(.985); box-shadow: inset 0 3px 8px rgba(0,0,0,.3), inset 0 -2px 6px rgba(0,0,0,.15); }
+  .panel > *{ position:relative; z-index:1; }
+
+  .screen{
+    display:inline-block;
+    margin: 3px 0 4px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #16110D, #0B0908);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,.7), inset 0 -1px 0 rgba(255,255,255,.03), 0 1px 0 rgba(255,255,255,.18);
+    position:relative;
+    overflow:hidden;
+  }
+  .screen::after{
+    content:"";
+    position:absolute; inset:0;
+    background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,0) 45%);
+    pointer-events:none;
+  }
+  .screen .digits{
+    color: #8f8574;
+    text-shadow: none;
+    transition: color .25s ease, text-shadow .25s ease;
+  }
+  .panel.is-active .screen .digits{
+    color: var(--brass-bright);
+    text-shadow: 0 0 8px rgba(217,183,124,.55), 0 0 2px rgba(217,183,124,.9);
+  }
+
+  .panel .mode-label{
+    font-family:'Spectral', serif;
+    font-style: italic;
+    font-size: 15px;
+    opacity:.75;
+    margin-bottom: 6px;
+  }
+  .panel .digits{
+    font-size: clamp(30px, 9vw, 44px);
+    font-weight: 700;
+    line-height:1;
+  }
+  .panel .hint{
+    margin-top:10px;
+    font-size: 11.5px;
+    font-family:'JetBrains Mono', monospace;
+    opacity: .55;
+  }
+  .panel .pip{
+    position:absolute;
+    top:16px; right:16px;
+    width:9px; height:9px;
+    border-radius:50%;
+    background: rgba(0,0,0,.18);
+  }
+
+  .panel.focused-panel.is-active{
+    background: linear-gradient(160deg, var(--focus-bright), var(--focus));
+    color: var(--cream);
+    box-shadow: 0 0 0 2px var(--brass-bright), inset 0 2px 6px rgba(255,255,255,.18), 0 10px 22px rgba(63,107,79,.35);
+  }
+  .panel.break-panel.is-active{
+    background: linear-gradient(160deg, var(--unfocus-bright), var(--unfocus));
+    color: var(--cream);
+    box-shadow: 0 0 0 2px var(--brass-bright), inset 0 2px 6px rgba(255,255,255,.18), 0 10px 22px rgba(166,71,43,.35);
+  }
+  .panel.is-active .pip{
+    background: var(--brass-bright);
+    box-shadow: 0 0 8px 2px rgba(217,183,124,.8);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .panel.is-idle{ opacity:.68; }
+  @keyframes pulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:.45; }
+  }
+
+  .hinge{
+    position:relative;
+    text-align:center;
+    margin-top: 6px;
+    padding: 9px 0 8px;
+    color: var(--brass-dim);
+    font-size: 11px;
+    font-family:'JetBrains Mono', monospace;
+    letter-spacing: .5px;
+    background: linear-gradient(180deg, rgba(0,0,0,.28), rgba(0,0,0,.06));
+    border-radius: 8px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,.45), inset 0 -1px 0 rgba(255,255,255,.03);
+  }
+  .hinge::before, .hinge::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:7px; height:7px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #e9d7ac, #8a6d42 65%, #5f4a2a 100%);
+    box-shadow: 0 1px 1px rgba(0,0,0,.6);
+  }
+  .hinge::before{ left:16px; }
+  .hinge::after{ right:16px; }
+
+  /* ---------- Transport controls ---------- */
+  .transport{
+    display:flex;
+    gap:10px;
+    margin: 16px 2px 4px;
+  }
+  .btn{
+    font-family:'Spectral', serif;
+    font-size: 15px;
+    border-radius: 12px;
+    padding: 13px 16px;
+    border: none;
+    cursor:pointer;
+    text-align:center;
+    flex:1;
+    transition: background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease, transform .08s ease;
+  }
+  .btn:active{ transform: translateY(1px) scale(.97); }
+  .btn-primary{
+    background: linear-gradient(180deg, var(--brass-bright), var(--brass) 55%, var(--brass-dim));
+    color: var(--walnut-seam);
+    font-weight:600;
+    text-shadow: 0 1px 0 rgba(255,255,255,.35);
+    border: 1px solid rgba(90,68,38,.55);
+    box-shadow: 0 7px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.5), inset 0 -3px 5px rgba(0,0,0,.2);
+    flex: 1.4;
+  }
+  .btn-primary:active{
+    box-shadow: inset 0 3px 7px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.2);
+  }
+  .btn-ghost{
+    background: linear-gradient(180deg, rgba(237,230,214,.05), rgba(0,0,0,.1));
+    color: var(--parchment);
+    border: 1px solid rgba(237,230,214,.26);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05), inset 0 -2px 4px rgba(0,0,0,.2);
+  }
+  .btn-danger{
+    background: linear-gradient(180deg, rgba(166,71,43,.08), rgba(0,0,0,.1));
+    color: var(--unfocus-bright);
+    border: 1px solid rgba(166,71,43,.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04), inset 0 -2px 4px rgba(0,0,0,.2);
+  }
+  .btn[disabled]{ opacity:.35; cursor:default; }
+
+  /* Rollover color states, desktop pointers only so touch screens never get stuck hover */
+  @media (hover: hover) and (pointer: fine){
+    .btn-primary:hover{
+      background: linear-gradient(180deg, #ECD09A, #C29A5F 55%, #9C7A48);
+      box-shadow: 0 9px 18px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.6), inset 0 -3px 5px rgba(0,0,0,.2);
+    }
+    .btn-ghost:hover{
+      background: rgba(237,230,214,.1);
+      border-color: rgba(217,183,124,.6);
+      color: var(--brass-bright);
+    }
+    .btn-danger:hover{
+      background: rgba(166,71,43,.18);
+      border-color: var(--unfocus-bright);
+      color: #E08A6E;
+    }
+    .icon-btn:hover{
+      background: var(--walnut);
+      border-color: var(--brass-bright);
+      color: var(--brass-bright);
+    }
+  }
+
+  /* ---------- Ticker ---------- */
+  .ticker-wrap{
+    margin: 22px 2px 0;
+  }
+  .ticker-wrap h2, .history h2{
+    font-size: 13px;
+    font-weight:500;
+    font-style: italic;
+    color: var(--brass-bright);
+    margin: 0 0 8px 2px;
+  }
+  .ticker{
+    max-height: 150px;
+    overflow-y:auto;
+    border-top: 1px solid rgba(237,230,214,.12);
+  }
+  .ticker-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding: 7px 2px;
+    border-bottom: 1px solid rgba(237,230,214,.08);
+    font-size: 12.5px;
+  }
+  .ticker-row .dot{
+    width:7px; height:7px; border-radius:50%; flex-shrink:0;
+  }
+  .dot.focused{ background: var(--focus-bright); }
+  .dot.break{ background: var(--unfocus-bright); }
+  .ticker-row .t{ font-family:'JetBrains Mono', monospace; opacity:.6; }
+  .ticker-row .m{ opacity:.9; }
+  .empty-note{
+    padding: 14px 2px;
+    font-size: 13px;
+    opacity:.5;
+    font-style: italic;
+  }
+
+  /* ---------- History ---------- */
+  .history{ margin: 26px 2px 0; }
+  .session-card{
+    background: var(--walnut-light);
+    border: 1px solid rgba(176,141,87,.2);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .session-card summary{
+    list-style:none;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap: 10px;
+  }
+  .session-card summary::-webkit-details-marker{ display:none; }
+  .session-card .name{ font-size:14.5px; font-style:italic; }
+  .session-card .date{ font-size:11px; color: var(--brass-bright); opacity:.8; margin-top:2px; }
+  .session-card .total{ font-family:'JetBrains Mono', monospace; font-size: 13px; white-space:nowrap; }
+  .ratio-bar{
+    display:flex;
+    height:7px;
+    border-radius:4px;
+    overflow:hidden;
+    margin-top:9px;
+    background: rgba(0,0,0,.3);
+  }
+  .ratio-bar .seg.focused{ background: var(--focus-bright); }
+  .ratio-bar .seg.break{ background: var(--unfocus-bright); }
+  .session-card .detail{
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(237,230,214,.15);
+    font-size: 12.5px;
+    display:flex;
+    justify-content:space-between;
+    color: var(--parchment-dim);
+  }
+  .session-card .row-actions{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+  }
+  .session-card .row-actions button{
+    font-size:11.5px;
+    padding: 6px 10px;
+    border-radius:8px;
+  }
+  .sync-tag{
+    font-size:10px;
+    font-family:'JetBrains Mono', monospace;
+    padding:2px 6px;
+    border-radius:5px;
+    border:1px solid rgba(176,141,87,.3);
+    color: var(--brass-bright);
+    margin-left:8px;
+  }
+
+  .maxim{
+    margin: 30px 2px 0;
+    padding: 16px 18px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.05));
+    border: 1px solid rgba(176,141,87,.22);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,.35), inset 0 -1px 0 rgba(255,255,255,.03);
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.65;
+    color: var(--parchment-dim);
+    text-align: center;
+  }
+  footer.app-footer{
+    text-align:center;
+    font-size: 11px;
+    opacity:.4;
+    margin-top: 34px;
+    padding-bottom: 10px;
+  }
+
+  /* ---------- Modal ---------- */
+  .w3-modal{ background-color: rgba(10,7,5,.72); }
+  .modal-card{
+    background: var(--walnut-light);
+    color: var(--parchment);
+    max-width: 460px;
+    margin: 12% auto;
+    border-radius: 16px;
+    padding: 22px 20px 18px;
+    border: 1px solid rgba(176,141,87,.3);
+    box-shadow: var(--shadow-deep);
+  }
+  .modal-card h3{ margin:0 0 4px; font-weight:600; }
+  .modal-card p.desc{ font-size: 13px; opacity:.7; margin-top:4px; line-height:1.5; }
+  .field{ margin-top: 16px; }
+  .field label{ display:block; font-size:12.5px; margin-bottom:6px; color: var(--brass-bright); }
+  .field input[type=text], .field input[type=url]{
+    width:100%;
+    background: var(--walnut);
+    border:1px solid rgba(176,141,87,.3);
+    color: var(--parchment);
+    border-radius:8px;
+    padding: 10px 11px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+  }
+  .field input[type=text]:focus, .field input[type=url]:focus{ outline:none; border-color: var(--brass-bright); }
+  .toggle-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:16px;
+  }
+  .switch{ position:relative; width:42px; height:24px; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{
+    position:absolute; cursor:pointer; inset:0;
+    background: rgba(237,230,214,.2);
+    border-radius: 24px;
+    transition:.2s;
+  }
+  .slider:before{
+    content:""; position:absolute; height:18px; width:18px; left:3px; top:3px;
+    background: var(--parchment); border-radius:50%; transition:.2s;
+  }
+  input:checked + .slider{ background: var(--focus); }
+  input:checked + .slider:before{ transform: translateX(18px); }
+
+  .modal-actions{
+    display:flex; gap:10px; margin-top: 20px;
+  }
+  .modal-actions .btn{ font-size:13.5px; padding:10px 14px; }
+  hr.sep{ border:none; border-top:1px solid rgba(237,230,214,.12); margin: 18px 0; }
+  .file-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .file-row .btn{ flex: 1 1 auto; }
+  .status-line{
+    font-size:11.5px;
+    color: var(--brass-bright);
+    margin-top:10px;
+    min-height: 14px;
+  }
+  .badge-offline{
+    display:inline-block;
+    font-size:10.5px;
+    font-family:'JetBrains Mono', monospace;
+    padding:2px 7px;
+    border-radius:6px;
+    border:1px solid rgba(166,71,43,.5);
+    color: var(--unfocus-bright);
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  .badge-online{ border-color: rgba(63,107,79,.5); color: var(--focus-bright); }
+
+  @media (prefers-reduced-motion: reduce){
+    .panel.is-active .pip{ animation: none; }
+    *{ transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div>
+      <h1>Checkmate<span class="tagline">Study Time Tracker</span></h1>
+      <span class="sub mono" id="dateLine">&nbsp;</span>
+    </div>
+    <button class="icon-btn" id="openSettings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2.06 2.06 0 1 1-2.92 2.92l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56v.17a2.06 2.06 0 1 1-4.12 0v-.09A1.7 1.7 0 0 0 8.76 18a1.7 1.7 0 0 0-1.87.34l-.06.06a2.06 2.06 0 1 1-2.92-2.92l.06-.06a1.7 1.7 0 0 0 .34-1.87A1.7 1.7 0 0 0 2.75 12.5h-.17a2.06 2.06 0 1 1 0-4.12h.09A1.7 1.7 0 0 0 4.24 7.24 1.7 1.7 0 0 0 3.9 5.37l-.06-.06A2.06 2.06 0 1 1 6.76 2.4l.06.06a1.7 1.7 0 0 0 1.87.34h.08A1.7 1.7 0 0 0 9.8 1.24V1.07a2.06 2.06 0 1 1 4.12 0v.09a1.7 1.7 0 0 0 1.03 1.56h.08a1.7 1.7 0 0 0 1.87-.34l.06-.06a2.06 2.06 0 1 1 2.92 2.92l-.06.06a1.7 1.7 0 0 0-.34 1.87v.08a1.7 1.7 0 0 0 1.56 1.03h.17a2.06 2.06 0 1 1 0 4.12h-.09a1.7 1.7 0 0 0-1.56 1.03z"/></svg>
+    </button>
+  </header>
+
+  <div class="session-strip">
+    <input type="text" class="session-title" id="sessionTitle" placeholder="Untitled session" maxlength="60">
+    <span class="session-total mono" id="sessionTotal">00:00:00</span>
+  </div>
+
+  <div class="clock-case">
+    <div class="panels">
+      <div class="panel focused-panel is-idle" id="focusedPanel" role="button" tabindex="0">
+        <span class="pip"></span>
+        <span class="mode-label">Focused</span>
+        <div class="screen"><span class="digits mono" id="focusedDigits">00:00:00</span></div>
+        <span class="hint">tap to switch in</span>
+      </div>
+      <div class="panel break-panel is-idle" id="breakPanel" role="button" tabindex="0">
+        <span class="pip"></span>
+        <span class="mode-label">Break</span>
+        <div class="screen"><span class="digits mono" id="breakDigits">00:00:00</span></div>
+        <span class="hint">tap to switch in</span>
+      </div>
+    </div>
+    <div class="hinge" id="statusLine">not started, tap a side to begin</div>
+  </div>
+
+  <div class="transport">
+    <button class="btn btn-primary" id="primaryBtn">Start studying</button>
+    <button class="btn btn-ghost" id="endBtn" disabled>End</button>
+  </div>
+
+  <div class="ticker-wrap">
+    <h2>This session</h2>
+    <div class="ticker" id="ticker">
+      <div class="empty-note">Switches you make will be logged here.</div>
+    </div>
+  </div>
+
+  <div class="history">
+    <h2>Past sessions</h2>
+    <div id="historyList">
+      <div class="empty-note">Nothing saved yet, finished sessions will appear here.</div>
+    </div>
+  </div>
+
+  <p class="maxim">Open this whenever you are working on class material. Be honest with yourself, only count time when you are truly focused. Switch to break time when you step away or lose focus. Your future self will thank you.</p>
+
+  <footer class="app-footer">
+    Checkmate Study Time Tracker runs entirely on this device.
+    <span class="badge-offline" id="netBadge">offline</span>
+  </footer>
+</div>
+
+<!-- Settings modal -->
+<div class="w3-modal" id="settingsModal">
+  <div class="modal-card">
+    <h3>Settings</h3>
+    <p class="desc">Checkmate Study Time Tracker stores everything on this device with IndexedDB. Cloud sync is optional, point it at an API Gateway endpoint backed by DynamoDB and finished sessions will be pushed there.</p>
+
+    <div class="field">
+      <label for="syncEndpoint">Sync endpoint (optional)</label>
+      <input type="url" id="syncEndpoint" placeholder="https://your-api.execute-api.region.amazonaws.com/sessions">
+    </div>
+    <div class="toggle-row">
+      <span style="font-size:13px;">Sync sessions on end</span>
+      <label class="switch">
+        <input type="checkbox" id="syncEnabled">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="status-line" id="syncStatus"></div>
+
+    <hr class="sep">
+
+    <div class="field" style="margin-top:0;">
+      <label>Backup</label>
+      <div class="file-row">
+        <button class="btn btn-ghost" id="exportBtn" style="padding:9px 12px; font-size:13px;">Export JSON</button>
+        <button class="btn btn-ghost" id="exportCsvBtn" style="padding:9px 12px; font-size:13px;">Export CSV</button>
+        <button class="btn btn-ghost" id="importBtn" style="padding:9px 12px; font-size:13px;">Import JSON</button>
+        <input type="file" id="importFile" accept="application/json" style="display:none;">
+      </div>
+    </div>
+
+    <hr class="sep">
+    <button class="btn btn-danger" id="clearAllBtn" style="width:100%;">Clear all data</button>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="closeSettings" style="flex:1;">Close</button>
+      <button class="btn btn-primary" id="saveSettings" style="flex:1;">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= IndexedDB layer ================= */
+  const DB_NAME = "studyClockDB";
+  const DB_VERSION = 1;
+  let dbPromise = null;
+
+  function openDB(){
+    if (dbPromise) return dbPromise;
+    dbPromise = new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains("sessions")){
+          const store = db.createObjectStore("sessions", { keyPath: "id" });
+          store.createIndex("startedAt", "startedAt", { unique: false });
+        }
+        if (!db.objectStoreNames.contains("settings")){
+          db.createObjectStore("settings", { keyPath: "key" });
+        }
+      };
+      req.onsuccess = (e) => resolve(e.target.result);
+      req.onerror = (e) => reject(e.target.error);
+    });
+    return dbPromise;
+  }
+
+  async function dbPut(storeName, value){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, "readwrite");
+      tx.objectStore(storeName).put(value);
+      tx.oncomplete = () => resolve(value);
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  async function dbGet(storeName, key){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, "readonly");
+      const req = tx.objectStore(storeName).get(key);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  async function dbGetAll(storeName){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, "readonly");
+      const req = tx.objectStore(storeName).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  async function dbDelete(storeName, key){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, "readwrite");
+      tx.objectStore(storeName).delete(key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  async function dbClearAll(){
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(["sessions","settings"], "readwrite");
+      tx.objectStore("sessions").clear();
+      tx.objectStore("settings").clear();
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  /* ================= Helpers ================= */
+  function uid(){
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random()*16|0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function msToClock(ms){
+    ms = Math.max(0, Math.floor(ms));
+    const totalSec = Math.floor(ms/1000);
+    const h = Math.floor(totalSec/3600);
+    const m = Math.floor((totalSec%3600)/60);
+    const s = totalSec%60;
+    return `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
+  function fmtTime(ts){
+    const d = new Date(ts);
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+  function fmtDate(ts){
+    const d = new Date(ts);
+    return d.toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+  }
+
+  /* ================= App state ================= */
+  const state = {
+    sessionId: null,
+    title: "",
+    status: "idle",       // idle | running | ended
+    activeMode: null,     // 'focused' | 'break' | null
+    focusedMs: 0,
+    breakMs: 0,
+    segmentStart: null,
+    log: [],              // { mode, at }
+    startedAt: null
+  };
+
+  let settings = { syncEndpoint: "", syncEnabled: false };
+
+  /* ================= DOM refs ================= */
+  const el = {
+    dateLine: document.getElementById('dateLine'),
+    sessionTitle: document.getElementById('sessionTitle'),
+    sessionTotal: document.getElementById('sessionTotal'),
+    focusedPanel: document.getElementById('focusedPanel'),
+    breakPanel: document.getElementById('breakPanel'),
+    focusedDigits: document.getElementById('focusedDigits'),
+    breakDigits: document.getElementById('breakDigits'),
+    statusLine: document.getElementById('statusLine'),
+    primaryBtn: document.getElementById('primaryBtn'),
+    endBtn: document.getElementById('endBtn'),
+    ticker: document.getElementById('ticker'),
+    historyList: document.getElementById('historyList'),
+    netBadge: document.getElementById('netBadge'),
+    settingsModal: document.getElementById('settingsModal'),
+    openSettings: document.getElementById('openSettings'),
+    closeSettings: document.getElementById('closeSettings'),
+    saveSettings: document.getElementById('saveSettings'),
+    syncEndpoint: document.getElementById('syncEndpoint'),
+    syncEnabled: document.getElementById('syncEnabled'),
+    syncStatus: document.getElementById('syncStatus'),
+    exportBtn: document.getElementById('exportBtn'),
+    exportCsvBtn: document.getElementById('exportCsvBtn'),
+    importBtn: document.getElementById('importBtn'),
+    importFile: document.getElementById('importFile'),
+    clearAllBtn: document.getElementById('clearAllBtn'),
+  };
+
+  /* ================= Rendering ================= */
+  function currentMs(mode){
+    let base = mode === 'focused' ? state.focusedMs : state.breakMs;
+    if (state.status === 'running' && state.activeMode === mode){
+      base += (Date.now() - state.segmentStart);
+    }
+    return base;
+  }
+
+  function render(){
+    el.focusedDigits.textContent = msToClock(currentMs('focused'));
+    el.breakDigits.textContent = msToClock(currentMs('break'));
+    el.sessionTotal.textContent = msToClock(currentMs('focused') + currentMs('break'));
+
+    el.focusedPanel.classList.toggle('is-active', state.status==='running' && state.activeMode==='focused');
+    el.breakPanel.classList.toggle('is-active', state.status==='running' && state.activeMode==='break');
+    el.focusedPanel.classList.toggle('is-idle', state.status==='idle');
+    el.breakPanel.classList.toggle('is-idle', state.status==='idle');
+
+    if (state.status === 'idle' || state.status === 'ended'){
+      const idleHint = state.status === 'ended' ? 'session ended' : 'tap to start here';
+      el.focusedPanel.querySelector('.hint').textContent = idleHint;
+      el.breakPanel.querySelector('.hint').textContent = idleHint;
+    } else {
+      el.focusedPanel.querySelector('.hint').textContent = state.activeMode === 'focused' ? 'now running, tap either side to switch' : 'tap to switch to this side';
+      el.breakPanel.querySelector('.hint').textContent = state.activeMode === 'break' ? 'now running, tap either side to switch' : 'tap to switch to this side';
+    }
+
+    if (state.status === 'idle'){
+      el.statusLine.textContent = 'not started, tap a side to begin';
+    } else if (state.status === 'running'){
+      el.statusLine.textContent = state.activeMode === 'focused' ? 'counting focused time' : 'counting break time';
+    } else if (state.status === 'ended'){
+      el.statusLine.textContent = 'session ended';
+    }
+
+    el.primaryBtn.textContent = state.status === 'idle' ? 'Start studying' : (state.status==='ended' ? 'Start new session' : 'Switch');
+    el.primaryBtn.style.visibility = state.status === 'running' ? 'hidden' : 'visible';
+    el.endBtn.disabled = state.status === 'idle' || state.status === 'ended';
+  }
+
+  let rafTimer = null;
+  function tick(){
+    render();
+    rafTimer = setTimeout(tick, 250);
+  }
+
+  function renderTicker(){
+    if (!state.log.length){
+      el.ticker.innerHTML = '<div class="empty-note">Switches you make will be logged here.</div>';
+      return;
+    }
+    const rows = state.log.slice().reverse().map(entry => {
+      const label = entry.mode === 'focused' ? 'switched to focused' : 'switched to break';
+      return `<div class="ticker-row"><span class="dot ${entry.mode}"></span><span class="t">${fmtTime(entry.at)}</span><span class="m">${label}</span></div>`;
+    }).join('');
+    el.ticker.innerHTML = rows;
+  }
+
+  /* ================= Timer actions ================= */
+  function finalizeSegment(){
+    if (state.status === 'running' && state.activeMode && state.segmentStart){
+      const elapsed = Date.now() - state.segmentStart;
+      if (state.activeMode === 'focused') state.focusedMs += elapsed;
+      else state.breakMs += elapsed;
+    }
+    state.segmentStart = null;
+  }
+
+  function switchTo(mode){
+    if (state.status === 'ended') return;
+    if (state.status === 'idle'){
+      state.sessionId = uid();
+      state.startedAt = Date.now();
+      state.title = el.sessionTitle.value.trim();
+    }
+    finalizeSegment();
+    state.status = 'running';
+    state.activeMode = mode;
+    state.segmentStart = Date.now();
+    state.log.push({ mode, at: Date.now() });
+    renderTicker();
+    render();
+  }
+
+  // A real chess clock has one paddle per side, but pressing either paddle always
+  // hands time to the other side, you can never press your own side back in.
+  // Idle: the panel you tap picks which mode the session opens on.
+  // Running: whichever panel you tap, the clock flips to the mode that is not
+  // currently running, so the same status can never fire twice in a row.
+  function pressPaddle(clickedMode){
+    if (state.status === 'ended') return;
+    if (state.status === 'idle'){
+      switchTo(clickedMode);
+      return;
+    }
+    const nextMode = state.activeMode === 'focused' ? 'break' : 'focused';
+    switchTo(nextMode);
+  }
+
+  async function endSession(){
+    if (state.status === 'idle' || state.status === 'ended') return;
+    const total = currentMs('focused') + currentMs('break');
+    if (!confirm(`End this session and save it? Total time logged: ${msToClock(total)}.`)) return;
+
+    finalizeSegment();
+    state.status = 'ended';
+    render();
+
+    const record = {
+      id: state.sessionId,
+      title: state.title || 'Untitled session',
+      startedAt: state.startedAt,
+      endedAt: Date.now(),
+      focusedMs: state.focusedMs,
+      breakMs: state.breakMs,
+      log: state.log,
+      syncStatus: 'local'
+    };
+    await dbPut('sessions', record);
+    await maybeSync(record);
+    await loadHistory();
+
+    setTimeout(resetToIdle, 900);
+  }
+
+  function resetToIdle(){
+    state.sessionId = null;
+    state.title = "";
+    state.status = "idle";
+    state.activeMode = null;
+    state.focusedMs = 0;
+    state.breakMs = 0;
+    state.segmentStart = null;
+    state.log = [];
+    state.startedAt = null;
+    el.sessionTitle.value = "";
+    renderTicker();
+    render();
+  }
+
+  function confirmReset(){
+    if (state.status === 'idle') return;
+    if (confirm('Discard the current session without saving it?')){
+      resetToIdle();
+    }
+  }
+
+  /* ================= Sync (optional, DynamoDB-backed API assumed) ================= */
+  async function maybeSync(record){
+    if (!settings.syncEnabled || !settings.syncEndpoint) return;
+    try{
+      const res = await fetch(settings.syncEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record)
+      });
+      record.syncStatus = res.ok ? 'synced' : 'error';
+    } catch(err){
+      record.syncStatus = 'error';
+    }
+    await dbPut('sessions', record);
+  }
+
+  /* ================= History ================= */
+  async function loadHistory(){
+    const all = await dbGetAll('sessions');
+    all.sort((a,b) => b.startedAt - a.startedAt);
+    if (!all.length){
+      el.historyList.innerHTML = '<div class="empty-note">Nothing saved yet, finished sessions will appear here.</div>';
+      return;
+    }
+    el.historyList.innerHTML = all.map(renderSessionCard).join('');
+
+    all.forEach(rec => {
+      const delBtn = document.getElementById('del-' + rec.id);
+      if (delBtn) delBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (confirm('Delete this session?')){
+          await dbDelete('sessions', rec.id);
+          loadHistory();
+        }
+      });
+    });
+  }
+
+  function renderSessionCard(rec){
+    const breakMsVal = rec.breakMs !== undefined ? rec.breakMs : (rec.unfocusedMs || 0);
+    const total = rec.focusedMs + breakMsVal;
+    const focusedPct = total ? Math.round((rec.focusedMs/total)*100) : 0;
+    const breakPct = 100 - focusedPct;
+    const tag = rec.syncStatus === 'synced' ? 'synced' : (rec.syncStatus === 'error' ? 'sync failed' : 'local only');
+    return `
+      <details class="session-card">
+        <summary>
+          <div>
+            <div class="name">${escapeHtml(rec.title || 'Untitled session')}</div>
+            <div class="date">${fmtDate(rec.startedAt)}<span class="sync-tag">${tag}</span></div>
+          </div>
+          <div class="total mono">${msToClock(total)}</div>
+        </summary>
+        <div class="ratio-bar">
+          <div class="seg focused" style="width:${focusedPct}%"></div>
+          <div class="seg break" style="width:${breakPct}%"></div>
+        </div>
+        <div class="detail">
+          <span>focused ${msToClock(rec.focusedMs)}</span>
+          <span>break ${msToClock(breakMsVal)}</span>
+        </div>
+        <div class="row-actions">
+          <button class="btn btn-danger" id="del-${rec.id}" style="flex:1;">Delete</button>
+        </div>
+      </details>
+    `;
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  /* ================= Settings modal ================= */
+  async function loadSettings(){
+    const rec = await dbGet('settings', 'app');
+    if (rec){
+      settings.syncEndpoint = rec.syncEndpoint || "";
+      settings.syncEnabled = !!rec.syncEnabled;
+    }
+    el.syncEndpoint.value = settings.syncEndpoint;
+    el.syncEnabled.checked = settings.syncEnabled;
+  }
+
+  async function saveSettings(){
+    settings.syncEndpoint = el.syncEndpoint.value.trim();
+    settings.syncEnabled = el.syncEnabled.checked;
+    await dbPut('settings', { key: 'app', ...settings });
+    el.syncStatus.textContent = 'Saved.';
+    setTimeout(() => { el.syncStatus.textContent = ''; }, 1600);
+  }
+
+  function openModal(){ el.settingsModal.style.display = 'block'; }
+  function closeModal(){ el.settingsModal.style.display = 'none'; }
+
+  /* ================= Export / Import ================= */
+  function downloadBlob(blob, filename){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function csvField(value){
+    const str = String(value ?? '');
+    if (/[",\n]/.test(str)) return '"' + str.replace(/"/g, '""') + '"';
+    return str;
+  }
+
+  async function exportCsv(){
+    const sessions = await dbGetAll('sessions');
+    sessions.sort((a,b) => a.startedAt - b.startedAt);
+    const header = ['title','started_at','ended_at','focused_hms','break_hms','total_hms','focused_seconds','break_seconds','total_seconds','switches','sync_status'];
+    const rows = sessions.map(rec => {
+      const breakMsVal = rec.breakMs !== undefined ? rec.breakMs : (rec.unfocusedMs || 0);
+      const total = rec.focusedMs + breakMsVal;
+      return [
+        csvField(rec.title || 'Untitled session'),
+        csvField(new Date(rec.startedAt).toISOString()),
+        csvField(rec.endedAt ? new Date(rec.endedAt).toISOString() : ''),
+        csvField(msToClock(rec.focusedMs)),
+        csvField(msToClock(breakMsVal)),
+        csvField(msToClock(total)),
+        csvField(Math.round(rec.focusedMs/1000)),
+        csvField(Math.round(breakMsVal/1000)),
+        csvField(Math.round(total/1000)),
+        csvField((rec.log || []).length),
+        csvField(rec.syncStatus || 'local')
+      ].join(',');
+    });
+    const csv = [header.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    downloadBlob(blob, `checkmate-sessions-${new Date().toISOString().slice(0,10)}.csv`);
+  }
+
+  async function exportData(){
+    const sessions = await dbGetAll('sessions');
+    const blob = new Blob([JSON.stringify({ exportedAt: Date.now(), sessions }, null, 2)], { type: 'application/json' });
+    downloadBlob(blob, `checkmate-backup-${new Date().toISOString().slice(0,10)}.json`);
+  }
+
+  function importData(file){
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try{
+        const data = JSON.parse(e.target.result);
+        const sessions = Array.isArray(data.sessions) ? data.sessions : (Array.isArray(data) ? data : []);
+        for (const s of sessions){
+          if (!s.id) s.id = uid();
+          await dbPut('sessions', s);
+        }
+        el.syncStatus.textContent = `Imported ${sessions.length} session(s).`;
+        loadHistory();
+      } catch(err){
+        el.syncStatus.textContent = 'Import failed, file was not valid JSON.';
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  /* ================= Wiring ================= */
+  el.focusedPanel.addEventListener('click', () => pressPaddle('focused'));
+  el.breakPanel.addEventListener('click', () => pressPaddle('break'));
+  [el.focusedPanel, el.breakPanel].forEach(p => {
+    p.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        p.click();
+      }
+    });
+  });
+
+  el.primaryBtn.addEventListener('click', () => {
+    if (state.status === 'idle') switchTo('focused');
+    else if (state.status === 'ended') resetToIdle();
+  });
+  el.endBtn.addEventListener('click', endSession);
+
+  el.openSettings.addEventListener('click', openModal);
+  el.closeSettings.addEventListener('click', closeModal);
+  el.saveSettings.addEventListener('click', saveSettings);
+  el.settingsModal.addEventListener('click', (e) => { if (e.target === el.settingsModal) closeModal(); });
+
+  el.exportBtn.addEventListener('click', exportData);
+  el.exportCsvBtn.addEventListener('click', exportCsv);
+  el.importBtn.addEventListener('click', () => el.importFile.click());
+  el.importFile.addEventListener('change', (e) => {
+    if (e.target.files[0]) importData(e.target.files[0]);
+    e.target.value = '';
+  });
+  el.clearAllBtn.addEventListener('click', async () => {
+    if (confirm('This deletes every saved session and setting on this device. Continue?')){
+      await dbClearAll();
+      settings = { syncEndpoint: "", syncEnabled: false };
+      loadSettings();
+      loadHistory();
+      resetToIdle();
+      closeModal();
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  document.getElementById('sessionTitle').addEventListener('input', (e) => {
+    state.title = e.target.value;
+  });
+
+  function updateNetBadge(){
+    const online = navigator.onLine;
+    el.netBadge.textContent = online ? 'online' : 'offline';
+    el.netBadge.classList.toggle('badge-online', online);
+  }
+  window.addEventListener('online', updateNetBadge);
+  window.addEventListener('offline', updateNetBadge);
+
+  function updateDateLine(){
+    const d = new Date();
+    el.dateLine.textContent = d.toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
+  }
+
+  /* ================= Boot ================= */
+  async function boot(){
+    updateDateLine();
+    updateNetBadge();
+    await loadSettings();
+    await loadHistory();
+    renderTicker();
+    render();
+    tick();
+  }
+
+  boot();
+
+  window.addEventListener('beforeunload', (e) => {
+    if (state.status === 'running'){
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
