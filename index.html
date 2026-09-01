@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --walnut:#2B211B;
@@ -38,7 +38,11 @@
   body{
     background: radial-gradient(circle at 50% -10%, #4a392b 0%, var(--walnut) 45%, var(--walnut-seam) 100%);
     color:var(--parchment);
-    font-family:'Spectral', Georgia, serif;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15.5px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     min-height:100vh;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior-y: none;
@@ -75,29 +79,29 @@
     padding: 6px 4px 18px;
   }
   header.top h1{
-    font-size: clamp(26px, 6vw, 34px);
-    font-weight: 600;
+    font-size: clamp(30px, 7vw, 38px);
+    font-weight: 800;
     margin: 0;
-    letter-spacing: 0.2px;
+    letter-spacing: -0.5px;
     color: var(--cream);
-    line-height: 1.1;
+    line-height: 1.05;
   }
   header.top h1 .tagline{
     display:block;
-    font-family:'Spectral', serif;
-    font-style: italic;
-    font-weight: 400;
-    font-size: 13px;
-    letter-spacing: 0.2px;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
     color: var(--brass-bright);
-    margin-top: 3px;
+    margin-top: 6px;
   }
   header.top .sub{
     display:block;
     margin-top: 6px;
-    font-size: 12.5px;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--brass-bright);
-    opacity:.65;
+    opacity:.7;
   }
   .icon-btn{
     background: linear-gradient(180deg, var(--walnut-light), var(--walnut-seam));
@@ -122,11 +126,11 @@
     background:transparent;
     border:none;
     color: var(--parchment);
-    font-family:'Spectral', serif;
-    font-style:italic;
-    font-size: 15px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 500;
     width: 100%;
-    padding: 4px 2px;
+    padding: 5px 2px;
     border-bottom: 1px dashed rgba(237,230,214,.25);
   }
   .session-title:focus{ outline:none; border-bottom-color: var(--brass-bright); }
@@ -227,22 +231,23 @@
   }
 
   .panel .mode-label{
-    font-family:'Spectral', serif;
-    font-style: italic;
-    font-size: 15px;
-    opacity:.75;
-    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    opacity:.8;
+    margin-bottom: 8px;
   }
   .panel .digits{
-    font-size: clamp(30px, 9vw, 44px);
+    font-size: clamp(32px, 9.5vw, 46px);
     font-weight: 700;
     line-height:1;
   }
   .panel .hint{
-    margin-top:10px;
-    font-size: 11.5px;
-    font-family:'JetBrains Mono', monospace;
-    opacity: .55;
+    margin-top:11px;
+    font-size: 12.5px;
+    font-weight: 500;
+    opacity: .62;
   }
   .panel .pip{
     position:absolute;
@@ -298,11 +303,11 @@
     position:relative;
     text-align:center;
     margin-top: 6px;
-    padding: 9px 0 8px;
-    color: var(--brass-dim);
-    font-size: 11px;
-    font-family:'JetBrains Mono', monospace;
-    letter-spacing: .5px;
+    padding: 10px 0 9px;
+    color: var(--brass);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .4px;
     background: linear-gradient(180deg, rgba(0,0,0,.28), rgba(0,0,0,.06));
     border-radius: 8px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,.45), inset 0 -1px 0 rgba(255,255,255,.03);
@@ -327,10 +332,12 @@
     margin: 16px 2px 4px;
   }
   .btn{
-    font-family:'Spectral', serif;
-    font-size: 15px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: .2px;
     border-radius: 12px;
-    padding: 13px 16px;
+    padding: 14px 16px;
     border: none;
     cursor:pointer;
     text-align:center;
@@ -341,7 +348,7 @@
   .btn-primary{
     background: linear-gradient(180deg, var(--brass-bright), var(--brass) 55%, var(--brass-dim));
     color: var(--walnut-seam);
-    font-weight:600;
+    font-weight:700;
     text-shadow: 0 1px 0 rgba(255,255,255,.35);
     border: 1px solid rgba(90,68,38,.55);
     box-shadow: 0 7px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.5), inset 0 -3px 5px rgba(0,0,0,.2);
@@ -392,11 +399,12 @@
     margin: 22px 2px 0;
   }
   .ticker-wrap h2, .history h2{
-    font-size: 13px;
-    font-weight:500;
-    font-style: italic;
+    font-size: 12px;
+    font-weight:700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
     color: var(--brass-bright);
-    margin: 0 0 8px 2px;
+    margin: 0 0 10px 2px;
   }
   .ticker{
     max-height: 150px;
@@ -407,9 +415,9 @@
     display:flex;
     align-items:center;
     gap:10px;
-    padding: 7px 2px;
+    padding: 8px 2px;
     border-bottom: 1px solid rgba(237,230,214,.08);
-    font-size: 12.5px;
+    font-size: 13.5px;
   }
   .ticker-row .dot{
     width:7px; height:7px; border-radius:50%; flex-shrink:0;
@@ -420,8 +428,8 @@
   .ticker-row .m{ opacity:.9; }
   .empty-note{
     padding: 14px 2px;
-    font-size: 13px;
-    opacity:.5;
+    font-size: 13.5px;
+    opacity:.55;
     font-style: italic;
   }
 
@@ -443,9 +451,9 @@
     gap: 10px;
   }
   .session-card summary::-webkit-details-marker{ display:none; }
-  .session-card .name{ font-size:14.5px; font-style:italic; }
-  .session-card .date{ font-size:11px; color: var(--brass-bright); opacity:.8; margin-top:2px; }
-  .session-card .total{ font-family:'JetBrains Mono', monospace; font-size: 13px; white-space:nowrap; }
+  .session-card .name{ font-size:15.5px; font-weight:500; }
+  .session-card .date{ font-size:12px; color: var(--brass-bright); opacity:.8; margin-top:3px; }
+  .session-card .total{ font-family:'JetBrains Mono', monospace; font-size: 14.5px; white-space:nowrap; }
   .ratio-bar{
     display:flex;
     height:7px;
@@ -460,7 +468,7 @@
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px dashed rgba(237,230,214,.15);
-    font-size: 12.5px;
+    font-size: 13.5px;
     display:flex;
     justify-content:space-between;
     color: var(--parchment-dim);
@@ -471,12 +479,12 @@
     gap:8px;
   }
   .session-card .row-actions button{
-    font-size:11.5px;
-    padding: 6px 10px;
+    font-size:13px;
+    padding: 8px 12px;
     border-radius:8px;
   }
   .sync-tag{
-    font-size:10px;
+    font-size:11px;
     font-family:'JetBrains Mono', monospace;
     padding:2px 6px;
     border-radius:5px;
@@ -492,16 +500,16 @@
     background: linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.05));
     border: 1px solid rgba(176,141,87,.22);
     box-shadow: inset 0 1px 3px rgba(0,0,0,.35), inset 0 -1px 0 rgba(255,255,255,.03);
-    font-size: 13px;
+    font-size: 14.5px;
     font-style: italic;
-    line-height: 1.65;
+    line-height: 1.7;
     color: var(--parchment-dim);
     text-align: center;
   }
   footer.app-footer{
     text-align:center;
-    font-size: 11px;
-    opacity:.4;
+    font-size: 12px;
+    opacity:.5;
     margin-top: 34px;
     padding-bottom: 10px;
   }
@@ -518,19 +526,19 @@
     border: 1px solid rgba(176,141,87,.3);
     box-shadow: var(--shadow-deep);
   }
-  .modal-card h3{ margin:0 0 4px; font-weight:600; }
-  .modal-card p.desc{ font-size: 13px; opacity:.7; margin-top:4px; line-height:1.5; }
+  .modal-card h3{ margin:0 0 4px; font-weight:700; font-size:19px; letter-spacing:-0.3px; }
+  .modal-card p.desc{ font-size: 13.5px; opacity:.7; margin-top:4px; line-height:1.55; }
   .field{ margin-top: 16px; }
-  .field label{ display:block; font-size:12.5px; margin-bottom:6px; color: var(--brass-bright); }
+  .field label{ display:block; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:7px; color: var(--brass-bright); }
   .field input[type=text], .field input[type=url]{
     width:100%;
     background: var(--walnut);
     border:1px solid rgba(176,141,87,.3);
     color: var(--parchment);
     border-radius:8px;
-    padding: 10px 11px;
+    padding: 11px 12px;
     font-family:'JetBrains Mono', monospace;
-    font-size:12.5px;
+    font-size:13.5px;
   }
   .field input[type=text]:focus, .field input[type=url]:focus{ outline:none; border-color: var(--brass-bright); }
   .toggle-row{
@@ -557,19 +565,20 @@
   .modal-actions{
     display:flex; gap:10px; margin-top: 20px;
   }
-  .modal-actions .btn{ font-size:13.5px; padding:10px 14px; }
+  .modal-actions .btn{ font-size:14.5px; padding:11px 14px; }
   hr.sep{ border:none; border-top:1px solid rgba(237,230,214,.12); margin: 18px 0; }
   .file-row{ display:flex; gap:8px; flex-wrap:wrap; }
   .file-row .btn{ flex: 1 1 auto; }
   .status-line{
-    font-size:11.5px;
+    font-size:12.5px;
+    font-weight:500;
     color: var(--brass-bright);
     margin-top:10px;
-    min-height: 14px;
+    min-height: 15px;
   }
   .badge-offline{
     display:inline-block;
-    font-size:10.5px;
+    font-size:11px;
     font-family:'JetBrains Mono', monospace;
     padding:2px 7px;
     border-radius:6px;
@@ -662,7 +671,7 @@
       <input type="url" id="syncEndpoint" placeholder="https://your-api.execute-api.region.amazonaws.com/sessions">
     </div>
     <div class="toggle-row">
-      <span style="font-size:13px;">Sync sessions on end</span>
+      <span style="font-size:14px; font-weight:500;">Sync sessions on end</span>
       <label class="switch">
         <input type="checkbox" id="syncEnabled">
         <span class="slider"></span>
@@ -675,9 +684,9 @@
     <div class="field" style="margin-top:0;">
       <label>Backup</label>
       <div class="file-row">
-        <button class="btn btn-ghost" id="exportBtn" style="padding:9px 12px; font-size:13px;">Export JSON</button>
-        <button class="btn btn-ghost" id="exportCsvBtn" style="padding:9px 12px; font-size:13px;">Export CSV</button>
-        <button class="btn btn-ghost" id="importBtn" style="padding:9px 12px; font-size:13px;">Import JSON</button>
+        <button class="btn btn-ghost" id="exportBtn" style="padding:10px 12px; font-size:13.5px;">Export JSON</button>
+        <button class="btn btn-ghost" id="exportCsvBtn" style="padding:10px 12px; font-size:13.5px;">Export CSV</button>
+        <button class="btn btn-ghost" id="importBtn" style="padding:10px 12px; font-size:13.5px;">Import JSON</button>
         <input type="file" id="importFile" accept="application/json" style="display:none;">
       </div>
     </div>
