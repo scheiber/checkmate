@@ -874,10 +874,17 @@
     el.endBtn.disabled = state.status === 'idle' || state.status === 'ended';
   }
 
-  let rafTimer = null;
+  // Live clock loop. Only reschedules itself while a segment is actually
+  // counting, so an idle or ended session isn't repainting four times a second.
+  const MIN_SEGMENT_MS = 1000;
+  let tickTimer = null;
   function tick(){
     render();
-    rafTimer = setTimeout(tick, 250);
+    clearTimeout(tickTimer);
+    tickTimer = state.status === 'running' ? setTimeout(tick, 250) : null;
+  }
+  function startTick(){
+    if (!tickTimer) tick();
   }
 
   function renderTicker(){
@@ -916,6 +923,7 @@
     state.log.push({ mode, at: Date.now() });
     renderTicker();
     render();
+    startTick();
   }
 
   // A real chess clock has one paddle per side, but pressing either paddle always
@@ -930,6 +938,9 @@
       switchTo('focused');
       return;
     }
+    // Swallow accidental double-taps: a switch less than a second after the
+    // last one just logs noise and a zero-length segment.
+    if (state.segmentStart && Date.now() - state.segmentStart < MIN_SEGMENT_MS) return;
     const nextMode = state.activeMode === 'focused' ? 'break' : 'focused';
     switchTo(nextMode);
   }
@@ -1009,7 +1020,7 @@
     el.historyList.innerHTML = all.map(renderSessionCard).join('');
 
     all.forEach(rec => {
-      const delBtn = document.getElementById('del-' + rec.id);
+      const delBtn = document.getElementById('del-' + idToken(rec.id));
       if (delBtn) delBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -1045,11 +1056,15 @@
           <span>break ${msToClock(breakMsVal)}</span>
         </div>
         <div class="row-actions">
-          <button class="btn btn-danger" id="del-${rec.id}" style="flex:1;">Delete</button>
+          <button class="btn btn-danger" id="del-${idToken(rec.id)}" style="flex:1;">Delete</button>
         </div>
       </details>
     `;
   }
+
+  // Session ids are uuids we generate, but an imported backup file could carry
+  // anything. Strip to a safe token before it ever lands in an HTML attribute.
+  function idToken(id){ return String(id == null ? '' : id).replace(/[^A-Za-z0-9_-]/g, ''); }
 
   function escapeHtml(str){
     const d = document.createElement('div');
@@ -1136,7 +1151,10 @@
         const data = JSON.parse(e.target.result);
         const sessions = Array.isArray(data.sessions) ? data.sessions : (Array.isArray(data) ? data : []);
         for (const s of sessions){
-          if (!s.id) s.id = uid();
+          // Normalise anything that would break the history markup or the math.
+          if (typeof s.id !== 'string' || s.id !== idToken(s.id) || !s.id) s.id = uid();
+          s.focusedMs = Number.isFinite(s.focusedMs) ? s.focusedMs : 0;
+          s.breakMs = Number.isFinite(s.breakMs) ? s.breakMs : (Number.isFinite(s.unfocusedMs) ? s.unfocusedMs : 0);
           await dbPut('sessions', s);
         }
         el.syncStatus.textContent = `Imported ${sessions.length} session(s).`;
@@ -1218,7 +1236,7 @@
     await loadHistory();
     renderTicker();
     render();
-    tick();
+    startTick();
   }
 
   boot();
