@@ -598,13 +598,13 @@
         <span class="pip"></span>
         <span class="mode-label">Focused</span>
         <div class="screen"><span class="digits mono" id="focusedDigits">00:00:00</span></div>
-        <span class="hint">tap to switch in</span>
+        <span class="hint">tap to start</span>
       </div>
       <div class="panel break-panel is-idle" id="breakPanel" role="button" tabindex="0">
         <span class="pip"></span>
         <span class="mode-label">Break</span>
         <div class="screen"><span class="digits mono" id="breakDigits">00:00:00</span></div>
-        <span class="hint">tap to switch in</span>
+        <span class="hint">sessions always start focused</span>
       </div>
     </div>
     <div class="hinge" id="statusLine">not started, tap a side to begin</div>
@@ -849,9 +849,13 @@
     el.breakPanel.classList.toggle('is-idle', state.status==='idle');
 
     if (state.status === 'idle' || state.status === 'ended'){
-      const idleHint = state.status === 'ended' ? 'session ended' : 'tap to start here';
-      el.focusedPanel.querySelector('.hint').textContent = idleHint;
-      el.breakPanel.querySelector('.hint').textContent = idleHint;
+      if (state.status === 'ended'){
+        el.focusedPanel.querySelector('.hint').textContent = 'session ended';
+        el.breakPanel.querySelector('.hint').textContent = 'session ended';
+      } else {
+        el.focusedPanel.querySelector('.hint').textContent = 'tap to start';
+        el.breakPanel.querySelector('.hint').textContent = 'sessions always start focused';
+      }
     } else {
       el.focusedPanel.querySelector('.hint').textContent = state.activeMode === 'focused' ? 'now running, tap either side to switch' : 'tap to switch to this side';
       el.breakPanel.querySelector('.hint').textContent = state.activeMode === 'break' ? 'now running, tap either side to switch' : 'tap to switch to this side';
@@ -919,10 +923,16 @@
   // Idle: the panel you tap picks which mode the session opens on.
   // Running: whichever panel you tap, the clock flips to the mode that is not
   // currently running, so the same status can never fire twice in a row.
+  // A real chess clock has one paddle per side, but pressing either paddle always
+  // hands time to the other side, you can never press your own side back in.
+  // Idle: every session opens on focused, regardless of which panel is tapped,
+  // break time can never be the first thing logged.
+  // Running: whichever panel you tap, the clock flips to the mode that is not
+  // currently running, so the same status can never fire twice in a row.
   function pressPaddle(clickedMode){
     if (state.status === 'ended') return;
     if (state.status === 'idle'){
-      switchTo(clickedMode);
+      switchTo('focused');
       return;
     }
     const nextMode = state.activeMode === 'focused' ? 'break' : 'focused';
