@@ -976,7 +976,8 @@
   const sounds = {
     focus: new Audio('focus.mp3'),
     break: new Audio('break.mp3'),
-    end: new Audio('end.mp3')
+    end: new Audio('end.mp3'),
+    confirm: new Audio('confirm.mp3')
   };
   Object.values(sounds).forEach(a => { a.preload = 'auto'; });
   function playSound(name){
@@ -1344,6 +1345,7 @@
     el.confirmOk.style.flex = '1';
     el.confirmModal.style.display = 'block';
     el.confirmOk.focus();
+    playSound('confirm');
     return new Promise(resolve => { confirmResolver = resolve; });
   }
   function closeConfirm(result){
