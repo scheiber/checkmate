@@ -186,6 +186,141 @@
   .session-strip{
     margin: 0 2px 14px;
   }
+  .countdown-row{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .countdown-row[hidden]{ display: none; }
+
+  /* Slide switch: brass knob in a recessed channel, up on the left / down on the right */
+  .mode-switch{
+    position: relative;
+    display: flex;
+    flex: 1 1 210px;
+    max-width: 300px;
+    padding: 3px;
+    border-radius: 9px;
+    background: linear-gradient(180deg, var(--screen-a), var(--screen-b));
+    box-shadow: inset 0 2px 5px rgba(0,0,0,.6), inset 0 -1px 0 rgba(255,255,255,.03), 0 1px 0 rgba(255,255,255,.14);
+    user-select: none;
+  }
+  .mode-switch-knob{
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: calc(50% - 3px);
+    border-radius: 7px;
+    background: linear-gradient(180deg, var(--brass-bright), var(--brass) 55%, var(--brass-dim));
+    border: 1px solid rgba(90,68,38,.5);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 4px rgba(0,0,0,.25), 0 2px 5px rgba(0,0,0,.35);
+    transition: transform .18s cubic-bezier(.4,.05,.2,1);
+  }
+  .mode-switch.is-down .mode-switch-knob{ transform: translateX(100%); }
+  .mode-opt{
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--parchment-dim);
+    transition: color .18s ease;
+  }
+  .mode-opt svg{
+    width: 9px;
+    height: 7px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .mode-switch.is-up .mode-opt[data-mode="up"],
+  .mode-switch.is-down .mode-opt[data-mode="down"]{
+    color: var(--walnut-seam);
+    text-shadow: 0 1px 0 rgba(255,255,255,.3);
+  }
+  .mode-opt:focus-visible{ outline: none; }
+  .mode-switch:focus-within{ box-shadow: inset 0 2px 5px rgba(0,0,0,.6), 0 0 0 2px var(--brass-bright); }
+
+  /* Minutes stepper: lit mini-screen with brass up/down keys */
+  .minutes-stepper{
+    display: inline-flex;
+    align-items: stretch;
+    flex: 0 0 auto;
+    gap: 7px;
+    padding: 3px 4px 3px 10px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, var(--screen-a), var(--screen-b));
+    box-shadow: inset 0 2px 5px rgba(0,0,0,.6), inset 0 -1px 0 rgba(255,255,255,.03), 0 1px 0 rgba(255,255,255,.14);
+  }
+  .minutes-stepper[hidden]{ display: none; }
+  #countdownMinutes{
+    width: 2.1em;
+    align-self: center;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--brass-bright);
+    text-shadow: 0 0 6px rgba(var(--glow),.5);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: right;
+  }
+  #countdownMinutes:focus{ outline: none; }
+  .stepper-unit{
+    align-self: center;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--brass-dim);
+  }
+  .stepper-arrows{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .step-btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 15px;
+    padding: 0;
+    border: 1px solid rgba(90,68,38,.5);
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--brass-bright), var(--brass) 60%, var(--brass-dim));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 1px 2px rgba(0,0,0,.35);
+    color: var(--walnut-seam);
+    cursor: pointer;
+  }
+  .step-btn:active{ box-shadow: inset 0 2px 4px rgba(0,0,0,.4); }
+  .step-btn:focus-visible{ outline: 2px solid var(--brass-bright); outline-offset: 1px; }
+  .step-btn svg{
+    width: 9px;
+    height: 6px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
   .activity-select{ position: relative; }
   .activity-trigger{
     display: flex;
@@ -419,6 +554,22 @@
   .total-panel .screen .digits{
     color: var(--brass-bright);
     text-shadow: 0 0 8px rgba(var(--glow),.55), 0 0 2px rgba(var(--glow),.9);
+  }
+  .total-panel.is-urgent .screen .digits{
+    color: var(--unfocus-bright);
+    text-shadow: 0 0 8px rgba(var(--break-rgb),.6), 0 0 2px rgba(var(--break-rgb),.95);
+  }
+  @keyframes expire-blink{
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0; }
+  }
+  .total-panel.is-expired .screen .digits{
+    color: var(--unfocus-bright);
+    text-shadow: 0 0 12px rgba(var(--break-rgb),.8), 0 0 3px rgba(var(--break-rgb),1);
+    animation: expire-blink .5s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .total-panel.is-expired .screen .digits{ animation: none; }
   }
 
   /* ---------- Transport controls ---------- */
@@ -733,11 +884,30 @@
       </div>
       <ul class="activity-menu" id="activityMenu" role="listbox" tabindex="-1"></ul>
     </div>
+    <div class="countdown-row" id="countdownRow">
+      <div class="mode-switch is-up" id="modeSwitch" role="radiogroup" aria-label="Timer direction">
+        <span class="mode-switch-knob" aria-hidden="true"></span>
+        <button type="button" class="mode-opt" data-mode="up" role="radio" aria-checked="true">
+          <svg viewBox="0 0 10 7" aria-hidden="true"><path d="M1 6 5 2l4 4"/></svg>Count up
+        </button>
+        <button type="button" class="mode-opt" data-mode="down" role="radio" aria-checked="false">
+          <svg viewBox="0 0 10 7" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>Count down
+        </button>
+      </div>
+      <div class="minutes-stepper" id="minutesStepper" hidden>
+        <input type="text" id="countdownMinutes" inputmode="numeric" maxlength="3" value="25" aria-label="Countdown minutes">
+        <span class="stepper-unit">min</span>
+        <span class="stepper-arrows">
+          <button type="button" class="step-btn" id="minUp" aria-label="More minutes"><svg viewBox="0 0 10 7" aria-hidden="true"><path d="M1 6 5 2l4 4"/></svg></button>
+          <button type="button" class="step-btn" id="minDown" aria-label="Fewer minutes"><svg viewBox="0 0 10 7" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button>
+        </span>
+      </div>
+    </div>
   </div>
 
   <div class="clock-case">
     <div class="panel total-panel">
-      <span class="mode-label">Total</span>
+      <span class="mode-label" id="totalLabel">Total</span>
       <div class="screen"><span class="digits mono" id="sessionTotal">00:00:00</span></div>
     </div>
     <div class="panels">
@@ -965,11 +1135,13 @@
     breakMs: 0,
     segmentStart: null,
     log: [],              // { mode, at }
-    startedAt: null
+    startedAt: null,
+    targetMs: 0           // 0 = count up; > 0 = count down from this budget (focused + break)
   };
 
   const THEMES = ['walnut', 'slate', 'mahogany', 'ebony', 'midnight'];
   let settings = { syncEndpoint: "", syncEnabled: false, theme: "walnut" };
+  let countMode = 'up';   // 'up' = count up, 'down' = count down from the minutes stepper
 
   // State-change cues. Files sit next to index.html; playback is always kicked
   // off by a tap, so the autoplay policy is satisfied.
@@ -999,6 +1171,14 @@
     activityTrigger: document.getElementById('activityTrigger'),
     activityLabel: document.getElementById('activityLabel'),
     activityMenu: document.getElementById('activityMenu'),
+    countdownRow: document.getElementById('countdownRow'),
+    modeSwitch: document.getElementById('modeSwitch'),
+    minutesStepper: document.getElementById('minutesStepper'),
+    countdownMinutes: document.getElementById('countdownMinutes'),
+    minUp: document.getElementById('minUp'),
+    minDown: document.getElementById('minDown'),
+    totalPanel: document.querySelector('.total-panel'),
+    totalLabel: document.getElementById('totalLabel'),
     sessionTotal: document.getElementById('sessionTotal'),
     focusedPanel: document.getElementById('focusedPanel'),
     breakPanel: document.getElementById('breakPanel'),
@@ -1037,10 +1217,31 @@
     return base;
   }
 
+  // Session budget remaining (focused + break). Only meaningful when targetMs > 0.
+  function remainingMs(){
+    return state.targetMs - (currentMs('focused') + currentMs('break'));
+  }
+
   function render(){
     el.focusedDigits.textContent = msToClock(currentMs('focused'));
     el.breakDigits.textContent = msToClock(currentMs('break'));
-    el.sessionTotal.textContent = msToClock(currentMs('focused') + currentMs('break'));
+
+    // Idle previews the budget from the inline control; running/ended use the
+    // target captured at session start.
+    const target = state.status === 'idle' ? countdownTargetMs() : state.targetMs;
+
+    if (target > 0){
+      const rem = state.status === 'idle' ? target : Math.max(0, remainingMs());
+      el.sessionTotal.textContent = msToClock(rem);
+      el.totalLabel.textContent = 'Remaining';
+      el.totalPanel.classList.toggle('is-urgent', state.status === 'running' && rem <= 60000);
+    } else {
+      el.sessionTotal.textContent = msToClock(currentMs('focused') + currentMs('break'));
+      el.totalLabel.textContent = 'Total';
+      el.totalPanel.classList.remove('is-urgent');
+    }
+
+    el.countdownRow.hidden = state.status !== 'idle';
 
     el.focusedPanel.classList.toggle('is-active', state.status==='running' && state.activeMode==='focused');
     el.breakPanel.classList.toggle('is-active', state.status==='running' && state.activeMode==='break');
@@ -1079,6 +1280,11 @@
   let tickTimer = null;
   function tick(){
     render();
+    if (state.status === 'running' && state.targetMs > 0 && remainingMs() <= 0){
+      tickTimer = null;
+      finishSession(true);   // countdown hit zero: blink, then auto-end and save
+      return;
+    }
     clearTimeout(tickTimer);
     tickTimer = state.status === 'running' ? setTimeout(tick, 250) : null;
   }
@@ -1113,6 +1319,7 @@
     if (state.status === 'idle'){
       state.sessionId = uid();
       state.startedAt = Date.now();
+      state.targetMs = countdownTargetMs();
     }
     finalizeSegment();
     state.status = 'running';
@@ -1144,6 +1351,13 @@
     switchTo(nextMode);
   }
 
+  // How many ms a new session should count down from, per the inline control.
+  function countdownTargetMs(){
+    if (countMode !== 'down') return 0;
+    const min = parseInt(el.countdownMinutes.value, 10);
+    return min > 0 ? Math.min(min, 600) * 60000 : 0;
+  }
+
   async function endSession(){
     if (state.status === 'idle' || state.status === 'ended') return;
     const total = currentMs('focused') + currentMs('break');
@@ -1153,11 +1367,28 @@
       confirmText: 'End & save'
     });
     if (!ok) return;
+    await finishSession();
+  }
+
+  // Save the running session and wind the clock back to idle. Shared by the
+  // manual End button and the countdown auto-end (expired = ran out of time).
+  let finishing = false;
+  let finishTimer = null;
+  async function finishSession(expired){
+    if (finishing || state.status !== 'running') return;
+    finishing = true;
 
     finalizeSegment();
     state.status = 'ended';
     playSound('end');
+    if (expired) el.totalPanel.classList.add('is-expired');
     render();
+
+    // Schedule the return to idle up front so a slow or failed save can't
+    // strand the clock. An expired countdown blinks 00:00:00 red for ~2.6s;
+    // a manual end shows the ended screen briefly. "New session" cancels it.
+    if (finishTimer) clearTimeout(finishTimer);
+    finishTimer = setTimeout(resetToIdle, expired ? 2600 : 900);
 
     const record = {
       id: state.sessionId,
@@ -1169,14 +1400,19 @@
       log: state.log,
       syncStatus: 'local'
     };
-    await dbPut('sessions', record);
-    await maybeSync(record);
-    await loadHistory();
-
-    setTimeout(resetToIdle, 900);
+    try {
+      await dbPut('sessions', record);
+      await maybeSync(record);
+      await loadHistory();
+    } catch(e){
+      // A failed save shouldn't strand the clock in the ended state.
+    }
   }
 
   function resetToIdle(){
+    if (finishTimer){ clearTimeout(finishTimer); finishTimer = null; }
+    finishing = false;
+    el.totalPanel.classList.remove('is-expired');
     state.sessionId = null;
     state.status = "idle";
     state.activeMode = null;
@@ -1185,6 +1421,7 @@
     state.segmentStart = null;
     state.log = [];
     state.startedAt = null;
+    state.targetMs = 0;
     setActivity(ACTIVITIES[0]);
     renderTicker();
     render();
@@ -1563,6 +1800,79 @@
   document.addEventListener('click', (e) => {
     if (activityMenuOpen() && !el.activitySelect.contains(e.target)) closeActivityMenu();
   });
+
+  /* ---- Count up / count down control ---- */
+  const MIN_MINUTES = 1, MAX_MINUTES = 600;
+
+  function setCountMode(mode, persist){
+    countMode = mode === 'down' ? 'down' : 'up';
+    el.modeSwitch.classList.toggle('is-down', countMode === 'down');
+    el.modeSwitch.classList.toggle('is-up', countMode === 'up');
+    el.modeSwitch.querySelectorAll('.mode-opt').forEach(b => {
+      b.setAttribute('aria-checked', b.dataset.mode === countMode ? 'true' : 'false');
+    });
+    el.minutesStepper.hidden = countMode !== 'down';
+    if (persist){ try { localStorage.setItem('checkmate-count-mode', countMode); } catch(e){} }
+    render();
+  }
+  function clampMinutes(){
+    let v = parseInt(el.countdownMinutes.value, 10);
+    if (!(v > 0)) v = 25;
+    v = Math.max(MIN_MINUTES, Math.min(MAX_MINUTES, v));
+    el.countdownMinutes.value = v;
+    return v;
+  }
+  function commitMinutes(){
+    const v = clampMinutes();
+    try { localStorage.setItem('checkmate-countdown-min', String(v)); } catch(e){}
+    render();
+  }
+  function stepMinutes(delta){
+    let v = parseInt(el.countdownMinutes.value, 10);
+    if (!(v > 0)) v = 25;
+    el.countdownMinutes.value = Math.max(MIN_MINUTES, Math.min(MAX_MINUTES, v + delta));
+    commitMinutes();
+  }
+
+  // Press-and-hold to repeat, for pointer input; keyboard fires a single step.
+  function bindHoldRepeat(btn, fn){
+    let holdT, repeatIv;
+    const stop = () => { clearTimeout(holdT); clearInterval(repeatIv); holdT = repeatIv = null; };
+    btn.addEventListener('pointerdown', (e) => {
+      if (e.button != null && e.button !== 0) return;
+      e.preventDefault();
+      fn();
+      holdT = setTimeout(() => { repeatIv = setInterval(fn, 90); }, 400);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => btn.addEventListener(ev, stop));
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fn(); }
+    });
+  }
+
+  try {
+    const savedMode = localStorage.getItem('checkmate-count-mode')
+      || (localStorage.getItem('checkmate-countdown-on') === '1' ? 'down' : 'up');
+    const savedMin = localStorage.getItem('checkmate-countdown-min');
+    if (savedMin && +savedMin > 0) el.countdownMinutes.value = Math.max(MIN_MINUTES, Math.min(MAX_MINUTES, +savedMin));
+    setCountMode(savedMode, false);
+  } catch(e){ setCountMode('up', false); }
+
+  el.modeSwitch.querySelectorAll('.mode-opt').forEach(btn => {
+    btn.addEventListener('click', () => setCountMode(btn.dataset.mode, true));
+  });
+  el.modeSwitch.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp'){ e.preventDefault(); setCountMode('up', true); el.modeSwitch.querySelector('[data-mode="up"]').focus(); }
+    else if (e.key === 'ArrowRight' || e.key === 'ArrowDown'){ e.preventDefault(); setCountMode('down', true); el.modeSwitch.querySelector('[data-mode="down"]').focus(); }
+  });
+  bindHoldRepeat(el.minUp, () => stepMinutes(1));
+  bindHoldRepeat(el.minDown, () => stepMinutes(-1));
+  el.countdownMinutes.addEventListener('input', () => {
+    el.countdownMinutes.value = el.countdownMinutes.value.replace(/\D/g, '').slice(0, 3);
+    render();
+  });
+  el.countdownMinutes.addEventListener('change', commitMinutes);
+  el.countdownMinutes.addEventListener('blur', commitMinutes);
 
   function updateNetBadge(){
     const online = navigator.onLine;
