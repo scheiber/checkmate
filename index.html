@@ -299,32 +299,6 @@
     text-shadow: 0 0 8px rgba(217,183,124,.55), 0 0 2px rgba(217,183,124,.9);
   }
 
-  .hinge{
-    position:relative;
-    text-align:center;
-    margin-top: 6px;
-    padding: 10px 0 9px;
-    color: var(--brass);
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: .4px;
-    background: linear-gradient(180deg, rgba(0,0,0,.28), rgba(0,0,0,.06));
-    border-radius: 8px;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,.45), inset 0 -1px 0 rgba(255,255,255,.03);
-  }
-  .hinge::before, .hinge::after{
-    content:"";
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    width:7px; height:7px;
-    border-radius:50%;
-    background: radial-gradient(circle at 35% 30%, #e9d7ac, #8a6d42 65%, #5f4a2a 100%);
-    box-shadow: 0 1px 1px rgba(0,0,0,.6);
-  }
-  .hinge::before{ left:16px; }
-  .hinge::after{ right:16px; }
-
   /* ---------- Transport controls ---------- */
   .transport{
     display:flex;
@@ -634,7 +608,6 @@
         <span class="hint">sessions always start focused</span>
       </div>
     </div>
-    <div class="hinge" id="statusLine">not started, tap a side to begin</div>
   </div>
 
   <div class="transport">
@@ -847,7 +820,6 @@
     breakPanel: document.getElementById('breakPanel'),
     focusedDigits: document.getElementById('focusedDigits'),
     breakDigits: document.getElementById('breakDigits'),
-    statusLine: document.getElementById('statusLine'),
     primaryBtn: document.getElementById('primaryBtn'),
     ticker: document.getElementById('ticker'),
     historyList: document.getElementById('historyList'),
@@ -901,14 +873,6 @@
     } else {
       el.focusedPanel.querySelector('.hint').textContent = state.activeMode === 'focused' ? 'now running, tap either side to switch' : 'tap to switch to this side';
       el.breakPanel.querySelector('.hint').textContent = state.activeMode === 'break' ? 'now running, tap either side to switch' : 'tap to switch to this side';
-    }
-
-    if (state.status === 'idle'){
-      el.statusLine.textContent = 'not started, tap a side to begin';
-    } else if (state.status === 'running'){
-      el.statusLine.textContent = state.activeMode === 'focused' ? 'counting focused time' : 'counting break time';
-    } else if (state.status === 'ended'){
-      el.statusLine.textContent = 'session ended';
     }
 
     // One button covers the whole lifecycle: start it, end it, start the next.
@@ -1041,11 +1005,15 @@
     render();
   }
 
-  function confirmReset(){
+  async function confirmReset(){
     if (state.status === 'idle') return;
-    if (confirm('Discard the current session without saving it?')){
-      resetToIdle();
-    }
+    const ok = await askConfirm({
+      title: 'Discard session?',
+      body: 'The current session will be cleared without being saved.',
+      confirmText: 'Discard',
+      danger: true
+    });
+    if (ok) resetToIdle();
   }
 
   /* ================= Sync (optional, DynamoDB-backed API assumed) ================= */
@@ -1079,7 +1047,13 @@
       if (delBtn) delBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (confirm('Delete this session?')){
+        const ok = await askConfirm({
+          title: 'Delete session?',
+          body: `"${rec.title || 'Untitled session'}" will be permanently removed from this device.`,
+          confirmText: 'Delete',
+          danger: true
+        });
+        if (ok){
           await dbDelete('sessions', rec.id);
           loadHistory();
         }
@@ -1275,7 +1249,13 @@
     e.target.value = '';
   });
   el.clearAllBtn.addEventListener('click', async () => {
-    if (confirm('This deletes every saved session and setting on this device. Continue?')){
+    const ok = await askConfirm({
+      title: 'Clear all data?',
+      body: 'Every saved session and setting on this device will be deleted. This cannot be undone.',
+      confirmText: 'Delete everything',
+      danger: true
+    });
+    if (ok){
       await dbClearAll();
       settings = { syncEndpoint: "", syncEnabled: false };
       loadSettings();
