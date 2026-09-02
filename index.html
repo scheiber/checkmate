@@ -200,10 +200,20 @@
     font-size: 16px;
     font-weight: 500;
     width: 100%;
-    padding: 5px 2px;
+    padding: 6px 26px 6px 2px;
     border-bottom: 1px dashed rgba(237,230,214,.25);
+    border-radius: 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23B08D57' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M1 1.75 6 6.25 11 1.75'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 2px center;
+    background-size: 12px 8px;
   }
   .session-title:focus{ outline:none; border-bottom-color: var(--brass-bright); }
+  .session-title:invalid{ color: var(--parchment); opacity: .55; }
+  .session-title option{ color:#1c1a17; background:#E9E2D2; }
 
   /* ---------- Clock case ---------- */
   .clock-case{
@@ -674,7 +684,14 @@
   </header>
 
   <div class="session-strip">
-    <input type="text" class="session-title" id="sessionTitle" placeholder="Untitled session" maxlength="60">
+    <select class="session-title" id="sessionTitle" aria-label="Activity" required>
+      <option value="" disabled selected>Choose activity…</option>
+      <option value="☁️ AWS Lab">☁️ AWS Lab</option>
+      <option value="🎥 AWS Video">🎥 AWS Video</option>
+      <option value="🤖 GenAI Discussion">🤖 GenAI Discussion</option>
+      <option value="💻 App Development">💻 App Development</option>
+      <option value="🧪 Codecademy Lab">🧪 Codecademy Lab</option>
+    </select>
   </div>
 
   <div class="clock-case">
@@ -1411,7 +1428,7 @@
     }
   });
 
-  document.getElementById('sessionTitle').addEventListener('input', (e) => {
+  document.getElementById('sessionTitle').addEventListener('change', (e) => {
     state.title = e.target.value;
   });
 
