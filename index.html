@@ -1241,8 +1241,8 @@
     settings.theme = document.documentElement.getAttribute('data-theme') || 'walnut';
     await dbPut('settings', { key: 'app', ...settings });
     try { localStorage.setItem('checkmate-theme', settings.theme); } catch(e){}
-    el.syncStatus.textContent = 'Saved.';
-    setTimeout(() => { el.syncStatus.textContent = ''; }, 1600);
+    el.syncStatus.textContent = '';
+    closeModal();
   }
 
   function openModal(){
