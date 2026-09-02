@@ -212,7 +212,6 @@
     background-size: 12px 8px;
   }
   .session-title:focus{ outline:none; border-bottom-color: var(--brass-bright); }
-  .session-title:invalid{ color: var(--parchment); opacity: .55; }
   .session-title option{ color:#1c1a17; background:#E9E2D2; }
 
   /* ---------- Clock case ---------- */
@@ -684,9 +683,8 @@
   </header>
 
   <div class="session-strip">
-    <select class="session-title" id="sessionTitle" aria-label="Activity" required>
-      <option value="" disabled selected>Choose activity…</option>
-      <option value="☁️ AWS Lab">☁️ AWS Lab</option>
+    <select class="session-title" id="sessionTitle" aria-label="Activity">
+      <option value="☁️ AWS Lab" selected>☁️ AWS Lab</option>
       <option value="🎥 AWS Video">🎥 AWS Video</option>
       <option value="🤖 GenAI Discussion">🤖 GenAI Discussion</option>
       <option value="💻 App Development">💻 App Development</option>
@@ -915,7 +913,7 @@
   /* ================= App state ================= */
   const state = {
     sessionId: null,
-    title: "",
+    title: "☁️ AWS Lab",
     status: "idle",       // idle | running | ended
     activeMode: null,     // 'focused' | 'break' | null
     focusedMs: 0,
@@ -1116,7 +1114,7 @@
 
   function resetToIdle(){
     state.sessionId = null;
-    state.title = "";
+    state.title = "☁️ AWS Lab";
     state.status = "idle";
     state.activeMode = null;
     state.focusedMs = 0;
@@ -1124,7 +1122,7 @@
     state.segmentStart = null;
     state.log = [];
     state.startedAt = null;
-    el.sessionTitle.value = "";
+    el.sessionTitle.selectedIndex = 0;
     renderTicker();
     render();
   }
