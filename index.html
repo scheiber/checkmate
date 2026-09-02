@@ -186,27 +186,82 @@
   .session-strip{
     margin: 0 2px 14px;
   }
-  .session-title{
-    background:transparent;
-    border:none;
+  .activity-select{ position: relative; }
+  .activity-trigger{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed rgba(237,230,214,.25);
+    border-radius: 0;
     color: var(--parchment);
     font-family: inherit;
     font-size: 16px;
     font-weight: 500;
-    width: 100%;
-    padding: 6px 26px 6px 2px;
-    border-bottom: 1px dashed rgba(237,230,214,.25);
-    border-radius: 0;
+    text-align: left;
+    padding: 6px 2px;
     cursor: pointer;
-    -webkit-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23B08D57' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M1 1.75 6 6.25 11 1.75'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 2px center;
-    background-size: 12px 8px;
+    user-select: none;
   }
-  .session-title:focus{ outline:none; border-bottom-color: var(--brass-bright); }
-  .session-title option{ color:#1c1a17; background:#E9E2D2; }
+  .activity-trigger span{ flex: 1; }
+  .activity-chevron{
+    width: 12px;
+    height: 8px;
+    flex-shrink: 0;
+    color: var(--brass);
+    transition: transform .15s ease;
+  }
+  .activity-select.open .activity-chevron{ transform: rotate(180deg); }
+  .activity-trigger:focus-visible{ outline: none; border-bottom-color: var(--brass-bright); }
+  .activity-select.open .activity-trigger{ border-bottom-color: var(--brass-bright); }
+  .activity-menu{
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    margin: 0;
+    padding: 5px;
+    list-style: none;
+    background: var(--walnut-light);
+    border: 1px solid rgba(var(--hair),.3);
+    border-radius: 11px;
+    box-shadow: var(--shadow-deep);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity .13s ease, transform .13s ease, visibility 0s linear .13s;
+  }
+  .activity-select.open .activity-menu{
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity .13s ease, transform .13s ease, visibility 0s;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .activity-menu{ transition: none; }
+  }
+  .activity-option{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 11px;
+    border-radius: 8px;
+    font-size: 15px;
+    color: var(--parchment);
+    cursor: pointer;
+  }
+  .activity-option.is-active{ background: rgba(var(--hair),.16); }
+  .activity-option.is-selected{ color: var(--brass-bright); font-weight: 600; }
+  .activity-option::after{
+    content: "✓";
+    margin-left: auto;
+    color: var(--brass-bright);
+    opacity: 0;
+  }
+  .activity-option.is-selected::after{ opacity: 1; }
 
   /* ---------- Clock case ---------- */
   .clock-case{
@@ -671,13 +726,13 @@
   </header>
 
   <div class="session-strip">
-    <select class="session-title" id="sessionTitle" aria-label="Activity">
-      <option value="☁️ AWS Lab" selected>☁️ AWS Lab</option>
-      <option value="🎥 AWS Video">🎥 AWS Video</option>
-      <option value="🤖 GenAI Discussion">🤖 GenAI Discussion</option>
-      <option value="💻 App Development">💻 App Development</option>
-      <option value="🧪 Codecademy Lab">🧪 Codecademy Lab</option>
-    </select>
+    <div class="activity-select" id="activitySelect">
+      <div class="activity-trigger" id="activityTrigger" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Activity">
+        <span id="activityLabel">☁️ AWS Lab</span>
+        <svg class="activity-chevron" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M1 1.75 6 6.25 11 1.75"/></svg>
+      </div>
+      <ul class="activity-menu" id="activityMenu" role="listbox" tabindex="-1"></ul>
+    </div>
   </div>
 
   <div class="clock-case">
@@ -899,9 +954,11 @@
   }
 
   /* ================= App state ================= */
+  const ACTIVITIES = ['☁️ AWS Lab', '🎥 AWS Video', '🤖 GenAI Discussion', '💻 App Development', '🧪 Codecademy Lab'];
+
   const state = {
     sessionId: null,
-    title: "☁️ AWS Lab",
+    title: ACTIVITIES[0],
     status: "idle",       // idle | running | ended
     activeMode: null,     // 'focused' | 'break' | null
     focusedMs: 0,
@@ -923,7 +980,10 @@
   /* ================= DOM refs ================= */
   const el = {
     dateLine: document.getElementById('dateLine'),
-    sessionTitle: document.getElementById('sessionTitle'),
+    activitySelect: document.getElementById('activitySelect'),
+    activityTrigger: document.getElementById('activityTrigger'),
+    activityLabel: document.getElementById('activityLabel'),
+    activityMenu: document.getElementById('activityMenu'),
     sessionTotal: document.getElementById('sessionTotal'),
     focusedPanel: document.getElementById('focusedPanel'),
     breakPanel: document.getElementById('breakPanel'),
@@ -1038,7 +1098,6 @@
     if (state.status === 'idle'){
       state.sessionId = uid();
       state.startedAt = Date.now();
-      state.title = el.sessionTitle.value.trim();
     }
     finalizeSegment();
     state.status = 'running';
@@ -1102,7 +1161,6 @@
 
   function resetToIdle(){
     state.sessionId = null;
-    state.title = "☁️ AWS Lab";
     state.status = "idle";
     state.activeMode = null;
     state.focusedMs = 0;
@@ -1110,7 +1168,7 @@
     state.segmentStart = null;
     state.log = [];
     state.startedAt = null;
-    el.sessionTitle.selectedIndex = 0;
+    setActivity(ACTIVITIES[0]);
     renderTicker();
     render();
   }
@@ -1410,12 +1468,82 @@
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape'){
       if (confirmOpen()) closeConfirm(false);
+      else if (activityMenuOpen()) closeActivityMenu();
       else closeModal();
     }
   });
 
-  document.getElementById('sessionTitle').addEventListener('change', (e) => {
-    state.title = e.target.value;
+  /* ================= Activity dropdown (custom listbox) ================= */
+  function buildActivityMenu(){
+    el.activityMenu.innerHTML = ACTIVITIES.map(a =>
+      `<li class="activity-option" role="option" data-value="${escapeHtml(a)}">${escapeHtml(a)}</li>`
+    ).join('');
+  }
+  function setActivity(value){
+    state.title = value;
+    el.activityLabel.textContent = value;
+    el.activityMenu.querySelectorAll('.activity-option').forEach(li => {
+      const on = li.dataset.value === value;
+      li.classList.toggle('is-selected', on);
+      li.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+  }
+  function activityMenuOpen(){ return el.activitySelect.classList.contains('open'); }
+  function highlightActivity(i){
+    const opts = [...el.activityMenu.querySelectorAll('.activity-option')];
+    opts.forEach((li, idx) => li.classList.toggle('is-active', idx === i));
+    activeActivityIndex = i;
+  }
+  function openActivityMenu(){
+    el.activitySelect.classList.add('open');
+    el.activityTrigger.setAttribute('aria-expanded', 'true');
+    const current = ACTIVITIES.indexOf(state.title);
+    highlightActivity(current < 0 ? 0 : current);
+  }
+  function closeActivityMenu(){
+    el.activitySelect.classList.remove('open');
+    el.activityTrigger.setAttribute('aria-expanded', 'false');
+    highlightActivity(-1);
+  }
+  let activeActivityIndex = -1;
+
+  buildActivityMenu();
+  setActivity(state.title);
+
+  el.activityTrigger.addEventListener('click', () => {
+    activityMenuOpen() ? closeActivityMenu() : openActivityMenu();
+  });
+  el.activityMenu.addEventListener('click', (e) => {
+    const li = e.target.closest('.activity-option');
+    if (!li) return;
+    setActivity(li.dataset.value);
+    closeActivityMenu();
+    el.activityTrigger.focus();
+  });
+  el.activityMenu.addEventListener('pointermove', (e) => {
+    const li = e.target.closest('.activity-option');
+    if (li) highlightActivity([...el.activityMenu.children].indexOf(li));
+  });
+  el.activitySelect.addEventListener('keydown', (e) => {
+    if (['ArrowDown', 'ArrowUp', 'Enter', ' ', 'Home', 'End'].includes(e.key)){
+      if (!activityMenuOpen()){
+        if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openActivityMenu(); }
+        return;
+      }
+      e.preventDefault();
+      if (e.key === 'ArrowDown') highlightActivity(Math.min(ACTIVITIES.length - 1, activeActivityIndex + 1));
+      else if (e.key === 'ArrowUp') highlightActivity(Math.max(0, activeActivityIndex - 1));
+      else if (e.key === 'Home') highlightActivity(0);
+      else if (e.key === 'End') highlightActivity(ACTIVITIES.length - 1);
+      else if (e.key === 'Enter' || e.key === ' '){
+        if (activeActivityIndex >= 0) setActivity(ACTIVITIES[activeActivityIndex]);
+        closeActivityMenu();
+        el.activityTrigger.focus();
+      }
+    }
+  });
+  document.addEventListener('click', (e) => {
+    if (activityMenuOpen() && !el.activitySelect.contains(e.target)) closeActivityMenu();
   });
 
   function updateNetBadge(){
