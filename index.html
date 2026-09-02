@@ -32,8 +32,6 @@
     --bg-glow:#4a392b;
     --case-a:#3A2C20;
     --case-b:#241B14;
-    --screw:#e7d4a6;
-    --screw-dim:#8a6d42;
     --screen-a:#16110D;
     --screen-b:#0B0908;
     --digit-off:#8f8574;
@@ -56,7 +54,6 @@
     --unfocus:#B06A2E; --unfocus-bright:#D18E4E;
     --ink:#1B1E21; --cream:#F0F3F5;
     --bg-glow:#3a4249; --case-a:#333A40; --case-b:#1E2327;
-    --screw:#cfd6dc; --screw-dim:#7a858e;
     --screen-a:#12151A; --screen-b:#080A0C; --digit-off:#7D8288;
     --hair:124,147,168; --glow:170,193,211; --focus-rgb:62,107,99; --break-rgb:176,106,46;
   }
@@ -70,7 +67,6 @@
     --unfocus:#B23B2B; --unfocus-bright:#D5654C;
     --ink:#241512; --cream:#F7EDE0;
     --bg-glow:#5a3428; --case-a:#442821; --case-b:#2A1611;
-    --screw:#f0d6a8; --screw-dim:#9a6f42;
     --screen-a:#1A0F0B; --screen-b:#0C0705; --digit-off:#94806F;
     --hair:192,138,74; --glow:231,180,108; --focus-rgb:74,107,69; --break-rgb:178,59,43;
   }
@@ -84,7 +80,6 @@
     --unfocus:#A85A46; --unfocus-bright:#C77E63;
     --ink:#161917; --cream:#EEF2EE;
     --bg-glow:#29332e; --case-a:#262B27; --case-b:#141715;
-    --screw:#cfe0d5; --screw-dim:#6f857a;
     --screen-a:#10130F; --screen-b:#070806; --digit-off:#7E857F;
     --hair:111,158,134; --glow:147,196,172; --focus-rgb:63,123,92; --break-rgb:168,90,70;
   }
@@ -98,7 +93,6 @@
     --unfocus:#B0507A; --unfocus-bright:#D0749A;
     --ink:#191825; --cream:#F1EFF8;
     --bg-glow:#3a3552; --case-a:#302E47; --case-b:#1C1A2B;
-    --screw:#d6d2ec; --screw-dim:#7a749e;
     --screen-a:#151422; --screen-b:#09090F; --digit-off:#807C92;
     --hair:138,130,196; --glow:176,168,224; --focus-rgb:63,107,107; --break-rgb:176,80,122;
   }
@@ -219,14 +213,8 @@
     position: relative;
     background-repeat: no-repeat;
     background-image:
-      radial-gradient(circle at 3px 3px, var(--screw) 0%, var(--screw-dim) 55%, transparent 60%),
-      radial-gradient(circle at 3px 3px, var(--screw) 0%, var(--screw-dim) 55%, transparent 60%),
-      radial-gradient(circle at 3px 3px, var(--screw) 0%, var(--screw-dim) 55%, transparent 60%),
-      radial-gradient(circle at 3px 3px, var(--screw) 0%, var(--screw-dim) 55%, transparent 60%),
       repeating-linear-gradient(97deg, rgba(0,0,0,.16) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,.025) 3px, rgba(0,0,0,0) 7px, rgba(0,0,0,.08) 9px, rgba(0,0,0,0) 13px),
       linear-gradient(180deg, var(--case-a), var(--case-b));
-    background-size: 8px 8px, 8px 8px, 8px 8px, 8px 8px, auto, auto;
-    background-position: 12px 12px, calc(100% - 12px) 12px, 12px calc(100% - 12px), calc(100% - 12px) calc(100% - 12px), 0 0, 0 0;
     border-radius: var(--radius-case);
     padding: 10px;
     box-shadow: var(--shadow-deep), inset 0 1px 0 rgba(255,255,255,.05);
