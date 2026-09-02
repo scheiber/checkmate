@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
+    /* ---- Walnut & Brass (default theme) ---- */
     --walnut:#2B211B;
     --walnut-light:#3D3025;
     --walnut-seam:#1C1510;
@@ -28,15 +29,84 @@
     --ink:#211A14;
     --cream:#F5EFE2;
     --danger:#8C3B2C;
+    --bg-glow:#4a392b;
+    --case-a:#3A2C20;
+    --case-b:#241B14;
+    --screw:#e7d4a6;
+    --screw-dim:#8a6d42;
+    --screen-a:#16110D;
+    --screen-b:#0B0908;
+    --digit-off:#8f8574;
+    --hair:176,141,87;
+    --glow:217,183,124;
+    --focus-rgb:63,107,79;
+    --break-rgb:166,71,43;
+
     --radius-case:22px;
     --radius-panel:14px;
     --shadow-deep: 0 18px 40px rgba(0,0,0,.45), 0 2px 0 rgba(255,255,255,.03) inset;
   }
 
+  /* ---- Slate & Steel ---- */
+  [data-theme="slate"]{
+    --walnut:#262A2E; --walnut-light:#363C42; --walnut-seam:#16191C;
+    --parchment:#E8EAEC; --parchment-dim:#D0D5D9;
+    --brass:#7C93A8; --brass-bright:#AAC1D3; --brass-dim:#5A6B7A;
+    --focus:#3E6B63; --focus-bright:#5C948A;
+    --unfocus:#B06A2E; --unfocus-bright:#D18E4E;
+    --ink:#1B1E21; --cream:#F0F3F5;
+    --bg-glow:#3a4249; --case-a:#333A40; --case-b:#1E2327;
+    --screw:#cfd6dc; --screw-dim:#7a858e;
+    --screen-a:#12151A; --screen-b:#080A0C; --digit-off:#7D8288;
+    --hair:124,147,168; --glow:170,193,211; --focus-rgb:62,107,99; --break-rgb:176,106,46;
+  }
+
+  /* ---- Mahogany & Gold ---- */
+  [data-theme="mahogany"]{
+    --walnut:#34211D; --walnut-light:#48302A; --walnut-seam:#21120F;
+    --parchment:#F0E4D8; --parchment-dim:#DFCBB9;
+    --brass:#C08A4A; --brass-bright:#E7B46C; --brass-dim:#96682F;
+    --focus:#4A6B45; --focus-bright:#6B9463;
+    --unfocus:#B23B2B; --unfocus-bright:#D5654C;
+    --ink:#241512; --cream:#F7EDE0;
+    --bg-glow:#5a3428; --case-a:#442821; --case-b:#2A1611;
+    --screw:#f0d6a8; --screw-dim:#9a6f42;
+    --screen-a:#1A0F0B; --screen-b:#0C0705; --digit-off:#94806F;
+    --hair:192,138,74; --glow:231,180,108; --focus-rgb:74,107,69; --break-rgb:178,59,43;
+  }
+
+  /* ---- Ebony & Jade ---- */
+  [data-theme="ebony"]{
+    --walnut:#1C1F1D; --walnut-light:#2A2F2C; --walnut-seam:#101211;
+    --parchment:#E4E8E4; --parchment-dim:#CAD1CB;
+    --brass:#6F9E86; --brass-bright:#93C4AC; --brass-dim:#4E7360;
+    --focus:#3F7B5C; --focus-bright:#5EA37D;
+    --unfocus:#A85A46; --unfocus-bright:#C77E63;
+    --ink:#161917; --cream:#EEF2EE;
+    --bg-glow:#29332e; --case-a:#262B27; --case-b:#141715;
+    --screw:#cfe0d5; --screw-dim:#6f857a;
+    --screen-a:#10130F; --screen-b:#070806; --digit-off:#7E857F;
+    --hair:111,158,134; --glow:147,196,172; --focus-rgb:63,123,92; --break-rgb:168,90,70;
+  }
+
+  /* ---- Midnight & Iris ---- */
+  [data-theme="midnight"]{
+    --walnut:#222134; --walnut-light:#323049; --walnut-seam:#14131F;
+    --parchment:#E7E5F0; --parchment-dim:#CFCCDF;
+    --brass:#8A82C4; --brass-bright:#B0A8E0; --brass-dim:#615A93;
+    --focus:#3F6B6B; --focus-bright:#5C9494;
+    --unfocus:#B0507A; --unfocus-bright:#D0749A;
+    --ink:#191825; --cream:#F1EFF8;
+    --bg-glow:#3a3552; --case-a:#302E47; --case-b:#1C1A2B;
+    --screw:#d6d2ec; --screw-dim:#7a749e;
+    --screen-a:#151422; --screen-b:#09090F; --digit-off:#807C92;
+    --hair:138,130,196; --glow:176,168,224; --focus-rgb:63,107,107; --break-rgb:176,80,122;
+  }
+
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background: radial-gradient(circle at 50% -10%, #4a392b 0%, var(--walnut) 45%, var(--walnut-seam) 100%);
+    background: radial-gradient(circle at 50% -10%, var(--bg-glow) 0%, var(--walnut) 45%, var(--walnut-seam) 100%);
     color:var(--parchment);
     font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 15.5px;
@@ -105,7 +175,7 @@
   }
   .icon-btn{
     background: linear-gradient(180deg, var(--walnut-light), var(--walnut-seam));
-    border: 1px solid rgba(176,141,87,.35);
+    border: 1px solid rgba(var(--hair),.35);
     color: var(--brass-bright);
     width: 42px; height: 42px;
     border-radius: 50%;
@@ -140,18 +210,18 @@
     position: relative;
     background-repeat: no-repeat;
     background-image:
-      radial-gradient(circle at 3px 3px, #e7d4a6 0%, #8a6d42 55%, transparent 60%),
-      radial-gradient(circle at 3px 3px, #e7d4a6 0%, #8a6d42 55%, transparent 60%),
-      radial-gradient(circle at 3px 3px, #e7d4a6 0%, #8a6d42 55%, transparent 60%),
-      radial-gradient(circle at 3px 3px, #e7d4a6 0%, #8a6d42 55%, transparent 60%),
+      radial-gradient(circle at 3px 3px, var(--screw) 0%, var(--screw-dim) 55%, transparent 60%),
+      radial-gradient(circle at 3px 3px, var(--screw) 0%, var(--screw-dim) 55%, transparent 60%),
+      radial-gradient(circle at 3px 3px, var(--screw) 0%, var(--screw-dim) 55%, transparent 60%),
+      radial-gradient(circle at 3px 3px, var(--screw) 0%, var(--screw-dim) 55%, transparent 60%),
       repeating-linear-gradient(97deg, rgba(0,0,0,.16) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,.025) 3px, rgba(0,0,0,0) 7px, rgba(0,0,0,.08) 9px, rgba(0,0,0,0) 13px),
-      linear-gradient(180deg, #3A2C20, #241B14);
+      linear-gradient(180deg, var(--case-a), var(--case-b));
     background-size: 8px 8px, 8px 8px, 8px 8px, 8px 8px, auto, auto;
     background-position: 12px 12px, calc(100% - 12px) 12px, 12px calc(100% - 12px), calc(100% - 12px) calc(100% - 12px), 0 0, 0 0;
     border-radius: var(--radius-case);
     padding: 10px;
     box-shadow: var(--shadow-deep), inset 0 1px 0 rgba(255,255,255,.05);
-    border: 1px solid rgba(176,141,87,.3);
+    border: 1px solid rgba(var(--hair),.3);
   }
   .clock-case::after{
     content:"";
@@ -209,7 +279,7 @@
     margin: 3px 0 4px;
     padding: 8px 12px;
     border-radius: 8px;
-    background: linear-gradient(180deg, #16110D, #0B0908);
+    background: linear-gradient(180deg, var(--screen-a), var(--screen-b));
     box-shadow: inset 0 2px 5px rgba(0,0,0,.7), inset 0 -1px 0 rgba(255,255,255,.03), 0 1px 0 rgba(255,255,255,.18);
     position:relative;
     overflow:hidden;
@@ -221,13 +291,13 @@
     pointer-events:none;
   }
   .screen .digits{
-    color: #8f8574;
+    color: var(--digit-off);
     text-shadow: none;
     transition: color .25s ease, text-shadow .25s ease;
   }
   .panel.is-active .screen .digits{
     color: var(--brass-bright);
-    text-shadow: 0 0 8px rgba(217,183,124,.55), 0 0 2px rgba(217,183,124,.9);
+    text-shadow: 0 0 8px rgba(var(--glow),.55), 0 0 2px rgba(var(--glow),.9);
   }
 
   .panel .mode-label{
@@ -260,16 +330,16 @@
   .panel.focused-panel.is-active{
     background: linear-gradient(160deg, var(--focus-bright), var(--focus));
     color: var(--cream);
-    box-shadow: 0 0 0 2px var(--brass-bright), inset 0 2px 6px rgba(255,255,255,.18), 0 10px 22px rgba(63,107,79,.35);
+    box-shadow: 0 0 0 2px var(--brass-bright), inset 0 2px 6px rgba(255,255,255,.18), 0 10px 22px rgba(var(--focus-rgb),.35);
   }
   .panel.break-panel.is-active{
     background: linear-gradient(160deg, var(--unfocus-bright), var(--unfocus));
     color: var(--cream);
-    box-shadow: 0 0 0 2px var(--brass-bright), inset 0 2px 6px rgba(255,255,255,.18), 0 10px 22px rgba(166,71,43,.35);
+    box-shadow: 0 0 0 2px var(--brass-bright), inset 0 2px 6px rgba(255,255,255,.18), 0 10px 22px rgba(var(--break-rgb),.35);
   }
   .panel.is-active .pip{
     background: var(--brass-bright);
-    box-shadow: 0 0 8px 2px rgba(217,183,124,.8);
+    box-shadow: 0 0 8px 2px rgba(var(--glow),.8);
     animation: pulse 1.6s ease-in-out infinite;
   }
   .panel.is-idle{ opacity:.68; }
@@ -296,7 +366,7 @@
   .total-panel .mode-label{ margin-bottom: 4px; }
   .total-panel .screen .digits{
     color: var(--brass-bright);
-    text-shadow: 0 0 8px rgba(217,183,124,.55), 0 0 2px rgba(217,183,124,.9);
+    text-shadow: 0 0 8px rgba(var(--glow),.55), 0 0 2px rgba(var(--glow),.9);
   }
 
   /* ---------- Transport controls ---------- */
@@ -339,9 +409,9 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,.05), inset 0 -2px 4px rgba(0,0,0,.2);
   }
   .btn-danger{
-    background: linear-gradient(180deg, rgba(166,71,43,.08), rgba(0,0,0,.1));
+    background: linear-gradient(180deg, rgba(var(--break-rgb),.08), rgba(0,0,0,.1));
     color: var(--unfocus-bright);
-    border: 1px solid rgba(166,71,43,.4);
+    border: 1px solid rgba(var(--break-rgb),.4);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.04), inset 0 -2px 4px rgba(0,0,0,.2);
   }
   .btn[disabled]{ opacity:.35; cursor:default; }
@@ -349,16 +419,16 @@
   /* Rollover color states, desktop pointers only so touch screens never get stuck hover */
   @media (hover: hover) and (pointer: fine){
     .btn-primary:hover{
-      background: linear-gradient(180deg, #ECD09A, #C29A5F 55%, #9C7A48);
+      filter: brightness(1.09) saturate(1.03);
       box-shadow: 0 9px 18px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.6), inset 0 -3px 5px rgba(0,0,0,.2);
     }
     .btn-ghost:hover{
       background: rgba(237,230,214,.1);
-      border-color: rgba(217,183,124,.6);
+      border-color: rgba(var(--glow),.6);
       color: var(--brass-bright);
     }
     .btn-danger:hover{
-      background: rgba(166,71,43,.18);
+      background: rgba(var(--break-rgb),.18);
       border-color: var(--unfocus-bright);
       color: #E08A6E;
     }
@@ -412,7 +482,7 @@
   .history{ margin: 26px 2px 0; }
   .session-card{
     background: var(--walnut-light);
-    border: 1px solid rgba(176,141,87,.2);
+    border: 1px solid rgba(var(--hair),.2);
     border-radius: 12px;
     padding: 12px 14px;
     margin-bottom: 10px;
@@ -463,7 +533,7 @@
     font-family:'JetBrains Mono', monospace;
     padding:2px 6px;
     border-radius:5px;
-    border:1px solid rgba(176,141,87,.3);
+    border:1px solid rgba(var(--hair),.3);
     color: var(--brass-bright);
     margin-left:8px;
   }
@@ -473,7 +543,7 @@
     padding: 16px 18px;
     border-radius: 12px;
     background: linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.05));
-    border: 1px solid rgba(176,141,87,.22);
+    border: 1px solid rgba(var(--hair),.22);
     box-shadow: inset 0 1px 3px rgba(0,0,0,.35), inset 0 -1px 0 rgba(255,255,255,.03);
     font-size: 14.5px;
     font-style: italic;
@@ -498,7 +568,7 @@
     margin: 12% auto;
     border-radius: 16px;
     padding: 22px 20px 18px;
-    border: 1px solid rgba(176,141,87,.3);
+    border: 1px solid rgba(var(--hair),.3);
     box-shadow: var(--shadow-deep);
   }
   .modal-card.confirm-card{ max-width: 380px; margin: 18% auto; }
@@ -507,10 +577,28 @@
   .modal-card p.desc{ font-size: 13.5px; opacity:.7; margin-top:4px; line-height:1.55; }
   .field{ margin-top: 16px; }
   .field label{ display:block; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:7px; color: var(--brass-bright); }
+  .theme-row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .theme-swatch{
+    width:46px; height:46px; border-radius:11px; padding:0; cursor:pointer;
+    background: linear-gradient(160deg, var(--sw-a), var(--sw-b));
+    border:2px solid rgba(255,255,255,.12);
+    position:relative;
+    transition: border-color .15s ease, transform .08s ease;
+  }
+  .theme-swatch::after{
+    content:""; position:absolute; left:50%; top:50%;
+    width:15px; height:15px; border-radius:50%;
+    transform:translate(-50%,-50%);
+    background: var(--sw-dot);
+    box-shadow: 0 0 6px var(--sw-dot), inset 0 1px 1px rgba(255,255,255,.4);
+  }
+  .theme-swatch:active{ transform: scale(.93); }
+  .theme-swatch.is-active{ border-color: var(--brass-bright); }
+  .theme-swatch:focus-visible{ outline:2px solid var(--brass-bright); outline-offset:2px; }
   .field input[type=text], .field input[type=url]{
     width:100%;
     background: var(--walnut);
-    border:1px solid rgba(176,141,87,.3);
+    border:1px solid rgba(var(--hair),.3);
     color: var(--parchment);
     border-radius:8px;
     padding: 11px 12px;
@@ -559,12 +647,12 @@
     font-family:'JetBrains Mono', monospace;
     padding:2px 7px;
     border-radius:6px;
-    border:1px solid rgba(166,71,43,.5);
+    border:1px solid rgba(var(--break-rgb),.5);
     color: var(--unfocus-bright);
     margin-left:8px;
     vertical-align:middle;
   }
-  .badge-online{ border-color: rgba(63,107,79,.5); color: var(--focus-bright); }
+  .badge-online{ border-color: rgba(var(--focus-rgb),.5); color: var(--focus-bright); }
 
   @media (prefers-reduced-motion: reduce){
     .panel.is-active .pip{ animation: none; }
@@ -641,6 +729,17 @@
   <div class="modal-card">
     <h3>Settings</h3>
     <p class="desc">Checkmate Study Time Tracker stores everything on this device with IndexedDB. Cloud sync is optional, point it at an API Gateway endpoint backed by DynamoDB and finished sessions will be pushed there.</p>
+
+    <div class="field">
+      <label>Theme</label>
+      <div class="theme-row" id="themeRow">
+        <button type="button" class="theme-swatch" data-theme="walnut" style="--sw-a:#3A2C20;--sw-b:#241B14;--sw-dot:#D9B77C" aria-label="Walnut and brass"></button>
+        <button type="button" class="theme-swatch" data-theme="slate" style="--sw-a:#333A40;--sw-b:#1E2327;--sw-dot:#AAC1D3" aria-label="Slate and steel"></button>
+        <button type="button" class="theme-swatch" data-theme="mahogany" style="--sw-a:#442821;--sw-b:#2A1611;--sw-dot:#E7B46C" aria-label="Mahogany and gold"></button>
+        <button type="button" class="theme-swatch" data-theme="ebony" style="--sw-a:#262B27;--sw-b:#141715;--sw-dot:#93C4AC" aria-label="Ebony and jade"></button>
+        <button type="button" class="theme-swatch" data-theme="midnight" style="--sw-a:#302E47;--sw-b:#1C1A2B;--sw-dot:#B0A8E0" aria-label="Midnight and iris"></button>
+      </div>
+    </div>
 
     <div class="field">
       <label for="syncEndpoint">Sync endpoint (optional)</label>
@@ -809,7 +908,14 @@
     startedAt: null
   };
 
-  let settings = { syncEndpoint: "", syncEnabled: false };
+  const THEMES = ['walnut', 'slate', 'mahogany', 'ebony', 'midnight'];
+  let settings = { syncEndpoint: "", syncEnabled: false, theme: "walnut" };
+
+  // Paint the saved theme before the async settings load resolves, no flash.
+  try {
+    const cached = localStorage.getItem('checkmate-theme');
+    if (cached && THEMES.includes(cached)){ settings.theme = cached; applyTheme(cached); }
+  } catch(e){}
 
   /* ================= DOM refs ================= */
   const el = {
@@ -833,6 +939,7 @@
     openSettings: document.getElementById('openSettings'),
     closeSettings: document.getElementById('closeSettings'),
     saveSettings: document.getElementById('saveSettings'),
+    themeRow: document.getElementById('themeRow'),
     syncEndpoint: document.getElementById('syncEndpoint'),
     syncEnabled: document.getElementById('syncEnabled'),
     syncStatus: document.getElementById('syncStatus'),
@@ -1102,26 +1209,52 @@
   }
 
   /* ================= Settings modal ================= */
+  function applyTheme(name){
+    const t = THEMES.includes(name) ? name : 'walnut';
+    if (t === 'walnut') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', t);
+  }
+  function markThemeSwatch(name){
+    const t = THEMES.includes(name) ? name : 'walnut';
+    el.themeRow.querySelectorAll('.theme-swatch').forEach(b => {
+      b.classList.toggle('is-active', b.dataset.theme === t);
+    });
+  }
+
   async function loadSettings(){
     const rec = await dbGet('settings', 'app');
     if (rec){
       settings.syncEndpoint = rec.syncEndpoint || "";
       settings.syncEnabled = !!rec.syncEnabled;
     }
+    settings.theme = (rec && THEMES.includes(rec.theme)) ? rec.theme : 'walnut';
     el.syncEndpoint.value = settings.syncEndpoint;
     el.syncEnabled.checked = settings.syncEnabled;
+    applyTheme(settings.theme);
+    markThemeSwatch(settings.theme);
+    try { localStorage.setItem('checkmate-theme', settings.theme); } catch(e){}
   }
 
   async function saveSettings(){
     settings.syncEndpoint = el.syncEndpoint.value.trim();
     settings.syncEnabled = el.syncEnabled.checked;
+    settings.theme = document.documentElement.getAttribute('data-theme') || 'walnut';
     await dbPut('settings', { key: 'app', ...settings });
+    try { localStorage.setItem('checkmate-theme', settings.theme); } catch(e){}
     el.syncStatus.textContent = 'Saved.';
     setTimeout(() => { el.syncStatus.textContent = ''; }, 1600);
   }
 
-  function openModal(){ el.settingsModal.style.display = 'block'; }
-  function closeModal(){ el.settingsModal.style.display = 'none'; }
+  function openModal(){
+    markThemeSwatch(settings.theme);
+    el.settingsModal.style.display = 'block';
+  }
+  function closeModal(){
+    el.settingsModal.style.display = 'none';
+    // Drop any unsaved theme preview.
+    applyTheme(settings.theme);
+    markThemeSwatch(settings.theme);
+  }
 
   // Promise-based confirm rendered as an in-page modal, drop-in for window.confirm.
   let confirmResolver = null;
@@ -1235,6 +1368,12 @@
   el.openSettings.addEventListener('click', openModal);
   el.closeSettings.addEventListener('click', closeModal);
   el.saveSettings.addEventListener('click', saveSettings);
+  el.themeRow.addEventListener('click', (e) => {
+    const btn = e.target.closest('.theme-swatch');
+    if (!btn) return;
+    applyTheme(btn.dataset.theme);      // live preview; persisted on Save
+    markThemeSwatch(btn.dataset.theme);
+  });
   el.settingsModal.addEventListener('click', (e) => { if (e.target === el.settingsModal) closeModal(); });
 
   el.confirmOk.addEventListener('click', () => closeConfirm(true));
@@ -1257,8 +1396,8 @@
     });
     if (ok){
       await dbClearAll();
-      settings = { syncEndpoint: "", syncEnabled: false };
-      loadSettings();
+      settings = { syncEndpoint: "", syncEnabled: false, theme: "walnut" };
+      await loadSettings();
       loadHistory();
       resetToIdle();
       closeModal();
