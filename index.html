@@ -971,6 +971,20 @@
   const THEMES = ['walnut', 'slate', 'mahogany', 'ebony', 'midnight'];
   let settings = { syncEndpoint: "", syncEnabled: false, theme: "walnut" };
 
+  // State-change cues. Files sit next to index.html; playback is always kicked
+  // off by a tap, so the autoplay policy is satisfied.
+  const sounds = {
+    focus: new Audio('focus.mp3'),
+    break: new Audio('break.mp3'),
+    end: new Audio('end.mp3')
+  };
+  Object.values(sounds).forEach(a => { a.preload = 'auto'; });
+  function playSound(name){
+    const a = sounds[name];
+    if (!a) return;
+    try { a.currentTime = 0; a.play().catch(() => {}); } catch(e){}
+  }
+
   // Paint the saved theme before the async settings load resolves, no flash.
   try {
     const cached = localStorage.getItem('checkmate-theme');
@@ -1104,6 +1118,7 @@
     state.activeMode = mode;
     state.segmentStart = Date.now();
     state.log.push({ mode, at: Date.now() });
+    playSound(mode === 'break' ? 'break' : 'focus');
     renderTicker();
     render();
     startTick();
@@ -1140,6 +1155,7 @@
 
     finalizeSegment();
     state.status = 'ended';
+    playSound('end');
     render();
 
     const record = {
